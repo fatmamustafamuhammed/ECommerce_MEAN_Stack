@@ -1,25 +1,31 @@
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
+// Angular Material
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
-import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { CategoryService } from '../../../services/category';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
-export interface PeriodicElement {
-  name: string;
-  actions: string;
-}
+// Services & Models
+import { CategoryService } from '../../../services/category';
+import { ConfirmDialogService } from '../../../services/confirm-dialog';
+import { CategoryModel } from '../../../Models/category';
 
 @Component({
   selector: 'app-categories',
+  standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
@@ -27,56 +33,102 @@ export interface PeriodicElement {
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    RouterLink,
+    MatTooltipModule,
   ],
   templateUrl: './categories.html',
-  styleUrl: './categories.scss',
+  styleUrls: ['./categories.scss'],
 })
-export class Categories implements AfterViewInit, OnInit {
-  private _liveAnnouncer = inject(LiveAnnouncer);
+export class Categories implements OnInit, AfterViewInit {
+  private liveAnnouncer = inject(LiveAnnouncer);
+  private categoryService = inject(CategoryService);
+  private snackBar = inject(MatSnackBar);
+  private confirmService = inject(ConfirmDialogService);
+
   displayedColumns: string[] = ['id', 'name', 'actions'];
-  columns: string[] = ['id', 'name', 'actions'];
-  dataSource = new MatTableDataSource([] as any);
+  dataSource = new MatTableDataSource<CategoryModel>([]);
+  deletingId = '';
+  filterValue = '';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('table', { static: true }) table!: MatTable<PeriodicElement>;
 
-  categoryService = inject(CategoryService);
-
-  ngOnInit() {
-    this.getServerData();
-  }
-  private getServerData() {
-    this.categoryService.getCategories().subscribe((result: any) => {
-      console.log(result);
-      this.dataSource.data = result;
-    });
+  ngOnInit(): void {
+    this.loadCategories();
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.dataSource.data = categories;
+      },
+      error: () => {
+        this.showNotification('Failed to load categories', 'error');
+      },
+    });
   }
 
-  announceSortChange(sortState: Sort) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
+  applyFilter(event: Event): void {
+    this.filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = this.filterValue.trim().toLowerCase();
   }
 
-  delete(id: string) {
-    console.log(id);
-    this.categoryService.deleteCategoryById(id).subscribe((result: any) => {
-      console.log('Category Deleted.');
-      this.getServerData();
+  clearFilter(): void {
+    this.filterValue = '';
+    this.dataSource.filter = '';
+  }
+
+  announceSortChange(sortState: Sort): void {
+    const message = sortState.direction ? `Sorted ${sortState.direction}ending` : 'Sorting cleared';
+    this.liveAnnouncer.announce(message);
+  }
+
+  deleteCategory(category: CategoryModel): void {
+    if (!category._id) return;
+
+    this.confirmService.deleteConfirmation(category.name, 'category').subscribe((result) => {
+      if (result) {
+        this.performDelete(category._id!);
+      }
+    });
+  }
+
+  private performDelete(id: string): void {
+    this.deletingId = id;
+
+    this.categoryService
+      .deleteCategoryById(id)
+      .pipe(
+        finalize(() => {
+          this.deletingId = '';
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.showNotification('Category deleted successfully!', 'success');
+          this.loadCategories();
+        },
+        error: (error) => {
+          const message = error.error?.message || 'Failed to delete category';
+          this.showNotification(message, 'error');
+        },
+      });
+  }
+
+  isDeleting(id: string): boolean {
+    return this.deletingId === id;
+  }
+
+  private showNotification(message: string, type: 'success' | 'error'): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: type === 'success' ? ['success-snackbar'] : ['error-snackbar'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
     });
   }
 }
