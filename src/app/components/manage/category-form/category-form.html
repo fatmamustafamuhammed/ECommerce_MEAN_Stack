@@ -1,0 +1,17 @@
+<div class="flex flex-col items-center px-40 mt-10">
+  <h1 class="text-xl font-bold">Add New Category</h1>
+  <form class="shadow-sm w-96 p-4">
+    <div class="flex flex-wrap">
+      <div class="w-full gap-4">
+        <mat-form-field class="w-full">
+          <mat-label>Name</mat-label>
+          <input matInput type="text" placeholder="Name" [(ngModel)]="name" name="name" />
+        </mat-form-field>
+      </div>
+      <div class="w-full flex justify-center">
+        <button type="button" mat-raised-button style="background-color: white-smoke; color: rgb(71, 153, 114);"
+          [disabled]="!name" (click)="add()">Add</button>
+      </div>
+    </div>
+  </form>
+</div>
