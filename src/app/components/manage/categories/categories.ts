@@ -1,134 +1,141 @@
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-
-// Angular Material
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-
-// Services & Models
+import {
+  ReusableTable,
+  TableAction,
+  TableConfig,
+} from '../../../Shared/Components/Table/reusable-table/reusable-table';
 import { CategoryService } from '../../../services/category';
-import { ConfirmDialogService } from '../../../services/confirm-dialog';
+import { NotificationService } from '../../../Shared/Services/notification-service';
+import { ConfirmDialogService } from '../../../Shared/Services/confirm-dialog-service';
 import { CategoryModel } from '../../../Models/category';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    MatTableModule,
-    MatSortModule,
-    MatPaginatorModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-  ],
+  imports: [CommonModule, ReusableTable, MatButton],
   templateUrl: './categories.html',
   styleUrls: ['./categories.scss'],
 })
-export class Categories implements OnInit, AfterViewInit {
-  private liveAnnouncer = inject(LiveAnnouncer);
+export class Categories implements OnInit {
   private categoryService = inject(CategoryService);
-  private snackBar = inject(MatSnackBar);
   private confirmService = inject(ConfirmDialogService);
+  private notification = inject(NotificationService);
+  private router = inject(Router);
 
-  displayedColumns: string[] = ['id', 'name', 'actions'];
-  dataSource = new MatTableDataSource<CategoryModel>([]);
-  deletingId = '';
-  filterValue = '';
+  categories = signal<CategoryModel[]>([]);
+  loading = signal(false);
+  deletingId = signal<string | null>(null);
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  tableConfig: TableConfig = {
+    showFilter: true,
+    filterPlaceholder: 'Search categories...',
+    pageSizeOptions: [5, 10, 25, 50],
+    defaultPageSize: 5,
+    showFirstLastButtons: true,
+    noDataMessage: 'No categories found',
+    columns: [
+      {
+        name: 'ID',
+        property: '_id',
+        sortable: true,
+        width: '250px',
+      },
+      {
+        name: 'Name',
+        property: 'name',
+        sortable: true,
+        width: '250px',
+      },
+    ],
+    actions: this.getTableActions(),
+  };
 
   ngOnInit(): void {
     this.loadCategories();
   }
 
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
-  }
-
-  private loadCategories(): void {
-    this.categoryService.getCategories().subscribe({
-      next: (categories) => {
-        this.dataSource.data = categories;
+  private getTableActions(): TableAction[] {
+    return [
+      {
+        icon: 'edit',
+        label: 'Edit',
+        color: 'primary',
+        tooltip: 'Edit category',
+        handler: (category: CategoryModel) => this.editCategory(category),
       },
-      error: () => {
-        this.showNotification('Failed to load categories', 'error');
+      {
+        icon: 'delete',
+        label: 'Delete',
+        color: 'warn',
+        tooltip: 'Delete category',
+        disabledCondition: (category: CategoryModel) => this.isDeleting(category),
+        handler: (category: CategoryModel) => this.deleteCategory(category),
       },
-    });
+    ];
   }
 
-  applyFilter(event: Event): void {
-    this.filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = this.filterValue.trim().toLowerCase();
+  loadCategories(): void {
+    this.loading.set(true);
+
+    this.categoryService
+      .getCategories()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (categories) => {
+          this.categories.set(categories);
+        },
+        error: (error) => {
+          this.notification.error('Failed to load categories');
+          console.error('Error loading categories:', error);
+        },
+      });
   }
 
-  clearFilter(): void {
-    this.filterValue = '';
-    this.dataSource.filter = '';
-  }
-
-  announceSortChange(sortState: Sort): void {
-    const message = sortState.direction ? `Sorted ${sortState.direction}ending` : 'Sorting cleared';
-    this.liveAnnouncer.announce(message);
+  editCategory(category: CategoryModel): void {
+    this.router.navigate(['/admin/categories', category._id]);
   }
 
   deleteCategory(category: CategoryModel): void {
     if (!category._id) return;
 
-    this.confirmService.deleteConfirmation(category.name, 'category').subscribe((result) => {
-      if (result) {
+    this.confirmService.deleteConfirmation(category.name, 'category').subscribe((confirmed) => {
+      if (confirmed) {
         this.performDelete(category._id!);
       }
     });
   }
 
   private performDelete(id: string): void {
-    this.deletingId = id;
+    this.deletingId.set(id);
 
     this.categoryService
       .deleteCategoryById(id)
-      .pipe(
-        finalize(() => {
-          this.deletingId = '';
-        }),
-      )
+      .pipe(finalize(() => this.deletingId.set(null)))
       .subscribe({
         next: () => {
-          this.showNotification('Category deleted successfully!', 'success');
+          this.notification.success('Category deleted successfully!');
           this.loadCategories();
         },
         error: (error) => {
           const message = error.error?.message || 'Failed to delete category';
-          this.showNotification(message, 'error');
+          this.notification.error(message);
         },
       });
   }
 
-  isDeleting(id: string): boolean {
-    return this.deletingId === id;
+  isDeleting(category: CategoryModel): boolean {
+    return this.deletingId() === category._id;
   }
 
-  private showNotification(message: string, type: 'success' | 'error'): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      panelClass: type === 'success' ? ['success-snackbar'] : ['error-snackbar'],
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-    });
+  onRowClick(category: CategoryModel): void {
+    this.editCategory(category);
+  }
+
+  onAddNew(): void {
+    this.router.navigate(['/admin/categories/add']);
   }
 }

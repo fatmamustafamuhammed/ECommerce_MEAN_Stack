@@ -1,80 +1,122 @@
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
-import { finalize } from 'rxjs';
-import { environment } from '../../environment/environment';
+import { Observable, catchError, tap } from 'rxjs';
 import { CategoryModel } from '../Models/category';
+import { environment } from '../../environment/environment';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class CategoryService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  // State
-  private _loading = signal(false);
-  private _error = signal<string | null>(null);
+  // State management
+  private categories = signal<CategoryModel[]>([]);
+  private loading = signal<boolean>(false);
+  private error = signal<string | null>(null);
 
-  // Public signals
-  loading = this._loading.asReadonly();
-  error = this._error.asReadonly();
+  // Expose signals as readonly
+  readonly categories$ = this.categories.asReadonly();
+  readonly loading$ = this.loading.asReadonly();
+  readonly error$ = this.error.asReadonly();
 
-  // Helper methods
-  setLoading(loading: boolean) {
-    this._loading.set(loading);
+  // CRUD Operations
+  getCategories(): Observable<CategoryModel[]> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.get<CategoryModel[]>(`${this.baseUrl}/category/get`).pipe(
+      tap(categories => {
+        this.categories.set(categories);
+        this.loading.set(false);
+      }),
+      catchError(error => {
+        this.error.set('Failed to load categories');
+        this.loading.set(false);
+        throw error;
+      })
+    );
   }
 
-  setError(error: string | null) {
-    this._error.set(error);
+  getCategoryById(id: string): Observable<CategoryModel> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.get<CategoryModel>(`${this.baseUrl}/category/get/${id}`).pipe(
+      tap(() => this.loading.set(false)),
+      catchError(error => {
+        this.error.set('Failed to load category');
+        this.loading.set(false);
+        throw error;
+      })
+    );
   }
 
-  clearError() {
-    this._error.set(null);
+  addCategory(name: string): Observable<CategoryModel> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.post<CategoryModel>(`${this.baseUrl}/category/add`, { name }).pipe(
+      tap(newCategory => {
+        // Update local state
+        this.categories.update(categories => [...categories, newCategory]);
+        this.loading.set(false);
+      }),
+      catchError(error => {
+        this.error.set('Failed to add category');
+        this.loading.set(false);
+        throw error;
+      })
+    );
   }
 
-  // API Methods
-  getCategories() {
-    this._loading.set(true);
-    this._error.set(null);
+  updateCategory(id: string, name: string): Observable<CategoryModel> {
+    this.loading.set(true);
+    this.error.set(null);
 
-    return this.http
-      .get<CategoryModel[]>(`${this.baseUrl}/category/get`)
-      .pipe(finalize(() => this._loading.set(false)));
+    return this.http.put<CategoryModel>(`${this.baseUrl}/category/update/${id}`, { name }).pipe(
+      tap(updatedCategory => {
+        // Update local state
+        this.categories.update(categories =>
+          categories.map(c => c._id === id ? updatedCategory : c)
+        );
+        this.loading.set(false);
+      }),
+      catchError(error => {
+        this.error.set('Failed to update category');
+        this.loading.set(false);
+        throw error;
+      })
+    );
   }
 
-  getCategoryById(id: string) {
-    this._loading.set(true);
-    this._error.set(null);
+  deleteCategoryById(id: string): Observable<void> {
+    this.loading.set(true);
+    this.error.set(null);
 
-    return this.http
-      .get<CategoryModel>(`${this.baseUrl}/category/get/${id}`)
-      .pipe(finalize(() => this._loading.set(false)));
+    return this.http.delete<void>(`${this.baseUrl}/category/delete/${id}`).pipe(
+      tap(() => {
+        // Update local state
+        this.categories.update(categories =>
+          categories.filter(c => c._id !== id)
+        );
+        this.loading.set(false);
+      }),
+      catchError(error => {
+        this.error.set('Failed to delete category');
+        this.loading.set(false);
+        throw error;
+      })
+    );
   }
 
-  addCategory(name: string) {
-    this._loading.set(true);
-    this._error.set(null);
-
-    return this.http
-      .post(`${this.baseUrl}/category/add`, { name: name.trim() })
-      .pipe(finalize(() => this._loading.set(false)));
+  // State management methods
+  clearError(): void {
+    this.error.set(null);
   }
 
-  updateCategory(id: string, name: string) {
-    this._loading.set(true);
-    this._error.set(null);
-
-    return this.http
-      .put(`${this.baseUrl}/category/update/${id}`, { name: name.trim() })
-      .pipe(finalize(() => this._loading.set(false)));
-  }
-
-  deleteCategoryById(id: string) {
-    this._loading.set(true);
-    this._error.set(null);
-
-    return this.http
-      .delete(`${this.baseUrl}/category/delete/${id}`)
-      .pipe(finalize(() => this._loading.set(false)));
+  setLoading(isLoading: boolean): void {
+    this.loading.set(isLoading);
   }
 }

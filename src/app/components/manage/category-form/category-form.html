@@ -1,23 +1,70 @@
-<div class="category-form">
-  <h2 class="text-xl font-bold">{{ isEdit() ? 'Edit Category' : 'Add New Category' }}</h2>
+<div class="form-container">
+  <!-- Header -->
+  <div class="header-section">
+    <button type="button" mat-icon-button (click)="onCancel()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="page-title">{{ getPageTitle() }}</h1>
+  </div>
 
-  <form #form="ngForm" (ngSubmit)="onSubmit()">
-    <mat-form-field class="full-width">
-      <mat-label>Category Name</mat-label>
-      <input placeholder="name" matInput [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required
-        [disabled]="submitting()" />
-      @if (form.submitted && !name()) {
-      <mat-error>Name is required</mat-error>
-      }
-    </mat-form-field>
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-state">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+  }
 
-    <div class="actions">
+  <!-- Error State -->
+  @if (error() && !loading()) {
+  <div class="error-state">
+    <mat-icon class="error-icon">error</mat-icon>
+    <p class="error-message">{{ error() }}</p>
+    <button type="button" mat-raised-button color="primary" (click)="loadCategory()">
+      <mat-icon>refresh</mat-icon>
+      Try Again
+    </button>
+  </div>
+  }
+
+  <!-- Form -->
+  @if (!loading() && !error()) {
+  <form #form="ngForm" (ngSubmit)="onSubmit()" class="category-form">
+    <div class="form-content">
+      <mat-form-field class="full-width">
+        <mat-label>Category Name</mat-label>
+        <input matInput placeholder="Enter category name" [(ngModel)]="name" name="name" #nameInput="ngModel"
+          required minlength="2" maxlength="50" [disabled]="submitting()" />
+
+        <!-- Validation Messages -->
+        @if (nameInput.invalid && (nameInput.dirty || nameInput.touched || form.submitted)) {
+        <mat-error>
+          @if (nameInput.errors?.['required']) {
+          Category name is required
+          }
+          @if (nameInput.errors?.['minlength']) {
+          Name must be at least 2 characters
+          }
+        </mat-error>
+        }
+
+        <mat-hint align="end">{{ name().length }}/50</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
       <button type="button" matButton="outlined" (click)="onCancel()" [disabled]="submitting()">
         Cancel
       </button>
-      <button type="submit" matButton="outlined" color="primary" [disabled]="!name().trim() || submitting()">
-        {{ submitting() ? (isEdit() ? 'Updating...' : 'Adding...') : (isEdit() ? 'Update' : 'Add') }}
+
+      <button type="submit" matButton="outlined" color="primary" [disabled]="form.invalid || submitting()"
+        class="submit-button">
+        @if (submitting()) {
+        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+        }
+        <span>{{ getSubmitButtonText() }}</span>
       </button>
     </div>
   </form>
+  }
 </div>

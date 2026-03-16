@@ -1,0 +1,34 @@
+<div class="confirm-dialog">
+  <div class="dialog-header" [class.warn-header]="data.confirmColor === 'warn'"
+    [class.primary-header]="data.confirmColor === 'primary'">
+    <div class="dialog-header">
+    @if (data.showIcon) {
+    <mat-icon class="dialog-icon">{{ data.icon || (data.confirmColor === 'warn' ? 'warning' : 'info') }}</mat-icon>
+    }
+    <h2 mat-dialog-title class="dialog-title">{{ data.title }}</h2>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="message">{{ data.message }}</p>
+    @if (data.itemName) {
+    <div class="item-container">
+      <span class="item-label">Item:</span>
+      <span class="item-value">"{{ data.itemName }}"</span>
+    </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions" align="end">
+    @if (data.showCancelButton) {
+    <button type="button" matButton="outlined" (click)="onCancel()" class="cancel-btn">
+      {{ data.cancelText || 'Cancel' }}
+    </button>
+    }
+
+    <button type="button" matButton="outlined" [color]="data.confirmColor" (click)="onConfirm()" class="confirm-btn"
+      cdkFocusInitial>
+      {{ data.confirmText || 'Confirm' }}
+    </button>
+  </mat-dialog-actions>
+</div>

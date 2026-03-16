@@ -13,6 +13,7 @@ export interface ConfirmDialogData {
   confirmColor?: 'primary' | 'warn' | 'accent';
   showIcon?: boolean;
   icon?: string;
+  showCancelButton?: boolean;
 }
 
 @Component({
@@ -20,13 +21,21 @@ export interface ConfirmDialogData {
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
   templateUrl: './confirm-dialog.html',
-  styleUrls: ['./confirm-dialog.scss'],
+  styleUrls: ['./confirm-dialog.scss']
 })
 export class ConfirmDialog {
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData,
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
+  ) {
+    // Set defaults
+    this.data = {
+      showIcon: true,
+      showCancelButton: true,
+      confirmColor: 'warn',
+      ...data
+    };
+  }
 
   onConfirm(): void {
     this.dialogRef.close(true);
