@@ -12,7 +12,19 @@ export class CategoryService {
     return this.http.get('http://localhost:3000/category/get');
   }
 
+  getCategoryById(id: string) {
+    return this.http.get('http://localhost:3000/category/get/' + id);
+  }
+
   addCategory(name: string) {
     return this.http.post('http://localhost:3000/category/add', { name: name });
+  }
+
+  updateCategory(id: string, name: string) {
+    return this.http.put('http://localhost:3000/category/update/' + id, { name: name });
+  }
+
+  deleteCategoryById(id: string) {
+    return this.http.delete('http://localhost:3000/category/delete/' + id);
   }
 }

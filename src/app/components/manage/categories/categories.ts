@@ -27,7 +27,7 @@ export interface PeriodicElement {
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './categories.html',
   styleUrl: './categories.scss',
@@ -45,11 +45,15 @@ export class Categories implements AfterViewInit, OnInit {
   categoryService = inject(CategoryService);
 
   ngOnInit() {
+    this.getServerData();
+  }
+  private getServerData() {
     this.categoryService.getCategories().subscribe((result: any) => {
       console.log(result);
       this.dataSource.data = result;
     });
   }
+
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
@@ -66,5 +70,13 @@ export class Categories implements AfterViewInit, OnInit {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  delete(id: string) {
+    console.log(id);
+    this.categoryService.deleteCategoryById(id).subscribe((result: any) => {
+      console.log('Category Deleted.');
+      this.getServerData();
+    });
   }
 }
