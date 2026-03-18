@@ -1,0 +1,16 @@
+<div class="products-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h1 class="page-title">Manage Products</h1>
+    <button type="button" matButton="outlined" color="primary" (click)="onAddNew()" class="add-button">
+      Add New product
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-section">
+    <app-reusable-table [data]="products()" [config]="tableConfig" [loading]="loading()" [deletingId]="deletingId()"
+      (rowClick)="onRowClick($event)" (refresh)="loadProducts()">
+    </app-reusable-table>
+  </div>
+</div>
