@@ -1,0 +1,16 @@
+<div class="brands-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h1 class="page-title">Manage Brands</h1>
+    <button type="button" matButton="outlined" color="primary" (click)="onAddNew()" class="add-button">
+      Add New Brand
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-section">
+    <app-reusable-table [data]="brands()" [config]="tableConfig" [loading]="loading()" [deletingId]="deletingId()"
+      (rowClick)="onRowClick($event)" (refresh)="loadBrands()">
+    </app-reusable-table>
+  </div>
+</div>
