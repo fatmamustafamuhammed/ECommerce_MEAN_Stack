@@ -39,21 +39,19 @@
       <!-- Dynamic Columns -->
       @for (column of config.columns; track column.property) {
       <ng-container [matColumnDef]="column.property">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          [mat-sort-header]="column.sortable ? column.property : ''"
-          [style.width]="column.width"
-          class="header-cell">
+        <th mat-header-cell *matHeaderCellDef [mat-sort-header]="column.sortable ? column.property : ''"
+          [style.width]="column.width" class="header-cell">
           {{ column.name }}
         </th>
-        <td
-          mat-cell
-          *matCellDef="let element"
-          [style.width]="column.width"
-          class="cell"
-          (click)="onRowClick(element)">
-          {{ getCellValue(element, column) }}
+        <td mat-cell *matCellDef="let element" [style.width]="column.width" class="cell" (click)="onRowClick(element)">
+
+          <!-- Convert boolean to string -->
+          @if (typeof element[column.property] === 'boolean') {
+          {{ element[column.property] ? 'True' : 'False' }}
+          } @else {
+          {{ element[column.property] }}
+          }
+
         </td>
       </ng-container>
       }
@@ -65,7 +63,7 @@
         <td mat-cell *matCellDef="let element" class="cell actions-cell" (click)="$event.stopPropagation()">
           <div class="action-buttons">
             @for (action of config.actions; track action.label) {
-              @if (shouldShowAction(action, element)) {
+            @if (shouldShowAction(action, element)) {
               <button
                 type="button"
                 mat-icon-button
@@ -73,10 +71,10 @@
                 [matTooltip]="action.tooltip || action.label"
                 [disabled]="isActionDisabled(action, element)"
                 (click)="onActionClick($event, action, element)"
-                class="action-button">
-                <mat-icon>{{ action.icon }}</mat-icon>
-              </button>
-              }
+              class="action-button">
+              <mat-icon>{{ action.icon }}</mat-icon>
+            </button>
+            }
             }
           </div>
         </td>

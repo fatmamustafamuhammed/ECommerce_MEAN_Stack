@@ -15,6 +15,7 @@ import { ConfirmDialogService } from '../../../Shared/Services/confirm-dialog-se
 import { ProductService } from '../../../services/product';
 import { CategoryService } from '../../../services/category';
 import { ProductModel } from '../../../Models/product';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-product-form',
@@ -29,6 +30,7 @@ import { ProductModel } from '../../../Models/product';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatChipsModule,
+    MatCheckboxModule
   ],
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss'],
@@ -52,6 +54,8 @@ export class ProductForm implements OnInit {
   discount = signal<number | null>(null);
   images = signal<string[]>([]);
   categoryId = signal('');
+  isFeatured = signal(false);
+  isnew = signal(false);
 
   // UI state
   categories = signal<any[]>([]);
@@ -97,6 +101,8 @@ export class ProductForm implements OnInit {
             this.discount.set(product.discount || null);
             this.images.set(product.images || []);
             this.categoryId.set(product.categoryId || '');
+            this.isFeatured.set(product.isFeatured || false);
+            this.isnew.set(product.isnew || false);
           } else {
             this.notification.error('Product not found');
             this.navigateBack();
@@ -200,6 +206,8 @@ export class ProductForm implements OnInit {
       discount: this.discount() ?? 0,
       images: this.images(),
       categoryId: this.categoryId(),
+      isFeatured: this.isFeatured(),
+      isnew: this.isnew(),
     };
 
     const action = this.isEdit()
@@ -243,7 +251,9 @@ export class ProductForm implements OnInit {
       this.price() ||
       this.discount() ||
       this.images().length ||
-      this.categoryId()
+      this.categoryId() ||
+      this.isFeatured() ||
+      this.isnew()
     );
   }
 

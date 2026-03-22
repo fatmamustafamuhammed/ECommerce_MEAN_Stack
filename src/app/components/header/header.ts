@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { CategoryModel } from '../../Models/category';
+import { CategoryService } from './../../services/category';
+import { Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -7,15 +9,13 @@ import { Component } from '@angular/core';
   styleUrl: './header.scss',
 })
 export class Header {
-  categories: string[] = [
-    'Electronics',
-    'Fashion',
-    'Home & Living',
-    'Books',
-    'Sports',
-    'Toys',
-    'Beauty',
-  ];
+  categoryService = inject(CategoryService);
+  categoryList: CategoryModel[] = [];
+  ngOnInit() {
+    this.categoryService.getCategories().subscribe((result) => {
+      this.categoryList = result;
+    });
+  }
 
   searchQuery: string = '';
 

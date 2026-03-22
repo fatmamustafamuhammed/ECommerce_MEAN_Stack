@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { inject } from '@angular/core';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 export interface TableConfig {
   columns: TableColumnConfig[];
@@ -30,8 +31,13 @@ export interface TableColumnConfig {
   property: string;
   sortable?: boolean;
   width?: string;
-  cellTemplate?: 'text' | 'date' | 'currency' | 'custom';
+  cellTemplate?: 'text' | 'date' | 'currency' | 'custom' | 'boolean';
   format?: string;
+  type?: 'text' | 'checkbox' | 'date' | 'currency' | 'custom';
+  checkboxConfig?: {
+    onChange: (item: any, value: boolean) => void;
+    disabledCondition?: (item: any) => boolean;
+  };
 }
 
 export interface TableAction {
@@ -58,7 +64,8 @@ export interface TableAction {
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCheckboxModule
   ],
   templateUrl: './reusable-table.html',
   styleUrls: ['./reusable-table.scss']
@@ -189,18 +196,28 @@ export class ReusableTable implements OnInit, AfterViewInit, OnChanges {
     return this.deletingId === element._id;
   }
 
-  getCellValue(element: any, column: TableColumnConfig): any {
-    const value = element[column.property];
+getCellValue(element: any, column: TableColumnConfig): any {
+  const value = element[column.property];
 
-    switch (column.cellTemplate) {
-      case 'date':
-        return value ? new Date(value).toLocaleDateString() : '';
-      case 'currency':
-        return value ? `$${Number(value).toFixed(2)}` : '';
-      default:
-        return value || '';
-    }
+  switch (column.cellTemplate) {
+    case 'date':
+      return value ? new Date(value).toLocaleDateString() : '';
+    case 'currency':
+      return value ? `$${Number(value).toFixed(2)}` : '';
+    case 'boolean':
+      // Fix: Return 'true' or 'false' for boolean values
+      if (typeof value === 'boolean') {
+        return value ? 'true' : 'false';
+      }
+      return value || '';
+    default:
+      // Handle boolean values even without cellTemplate
+      if (typeof value === 'boolean') {
+        return value ? 'true' : 'false';
+      }
+      return value || '';
   }
+}
 
   onRowClick(element: any): void {
     this.rowClick.emit(element);
@@ -245,4 +262,10 @@ export class ReusableTable implements OnInit, AfterViewInit, OnChanges {
     }
     return Math.ceil(this.dataSource.filteredData.length / this.paginator.pageSize);
   }
+
+  onCheckboxChange(element: any, column: any, value: boolean): void {
+  if (column.checkboxConfig?.onChange) {
+    column.checkboxConfig.onChange(element, value);
+  }
+}
 }

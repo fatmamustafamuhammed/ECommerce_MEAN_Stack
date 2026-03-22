@@ -68,6 +68,18 @@ export class Products implements OnInit {
         sortable: true,
         width: '200px',
       },
+       {
+        name: 'isFeatured',
+        property: 'isFeatured',
+        sortable: true,
+        width: '100px',
+      },
+      {
+        name: 'isNew',
+        property: 'isnew',
+        sortable: true,
+        width: '100px',
+      },
 
     ],
     actions: this.getTableActions(),

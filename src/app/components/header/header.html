@@ -19,8 +19,10 @@
 
     <div class="category-bar">
       <ul class="category-menu">
-        @for (category of categories; track category) {
-        <a href="#">{{ category }}</a>
+        @for (category of categoryList; track category._id) {
+        <li>
+          <a href="#">{{ category.name }}</a>
+        </li>
         } @empty {
         <li>There are no items.</li>
         }

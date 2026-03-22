@@ -106,6 +106,8 @@ export class ProductService {
       discount: 0,
       images: [],
       categoryId: '',
+      isFeatured:false,
+      isnew:false
     } as ProductModel);
   }
 

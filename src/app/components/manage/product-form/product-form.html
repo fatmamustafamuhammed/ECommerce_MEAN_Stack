@@ -113,6 +113,22 @@
       </mat-form-field>
     </div>
 
+     <!-- Product Status -->
+    <div class="form-section">
+      <h2>Product Status</h2>
+
+      <div class="row">
+        <mat-checkbox [checked]="isFeatured()" (change)="isFeatured.set($event.checked)" name="isFeatured"
+          class="half-width">
+          Featured Product
+        </mat-checkbox>
+
+        <mat-checkbox [checked]="isnew()" (change)="isnew.set($event.checked)" name="isnew" class="half-width">
+          New Product
+        </mat-checkbox>
+      </div>
+    </div>
+
     <!-- Images -->
     <div class="form-section">
       <h2>Product Images</h2>
