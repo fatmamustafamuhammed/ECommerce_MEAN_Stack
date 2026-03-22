@@ -1,0 +1,30 @@
+<header class="header">
+  <div class="container">
+    <div class="top-bar">
+      <div class="logo" (click)="onLogoClick()">
+        Shop<span>Hub</span>
+      </div>
+
+      <div class="search-section">
+        <input type="text" class="search-input" placeholder="Search products..." (keyup.enter)="onSearch()" />
+        <button type="button" class="search-button" (click)="onSearch()">
+          Search
+        </button>
+      </div>
+
+      <div class="profile-link" (click)="onProfileClick()">
+        My Account
+      </div>
+    </div>
+
+    <div class="category-bar">
+      <ul class="category-menu">
+        @for (category of categories; track category) {
+        <a href="#">{{ category }}</a>
+        } @empty {
+        <li>There are no items.</li>
+        }
+      </ul>
+    </div>
+  </div>
+</header>
