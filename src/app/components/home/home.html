@@ -1,4 +1,4 @@
-<div class="carousel-container mt-2 p-4">
+<div class="carousel-container p-5 m-2 mt-2 border border-black">
   <owl-carousel-o [options]="customOptions" class="custom-carousel">
     @for (item of bannerImages; track $index) {
     <ng-template carouselSlide>
@@ -6,7 +6,7 @@
         <div style="display: flex; flex-direction: column; height: 400px;">
           <div style="flex: 3; overflow: hidden;">
             <img title="img" [src]="(item.images && item.images[0]) || 'assets/images/default-product.png'"
-              [alt]="item.name || 'Banner image'" style="width: 80%; height: 100%; object-fit: cover;">
+              [alt]="item.name || 'Banner image'" style="width: 70%; height: 100%; object-fit: cover;">
           </div>
 
           <div style="flex: 1; display: flex; align-items: center; padding: 5px; background: #f9fafb;">
@@ -20,8 +20,8 @@
 </div>
 
 <!-- Featured Products Section -->
-<div class="p-3">
-  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center">Featured Products</h4>
+<div class="p-5 m-2 border border-black">
+  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">Featured Products</h4>
 
   @if (featuredProducts && featuredProducts.length > 0) {
   <div class="flex flex-wrap gap-4">
@@ -36,8 +36,8 @@
 </div>
 
 <!-- New Products Section -->
-<div class="p-3 mt-6">
-  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center">New Products</h4>
+<div class="p-5 mt-6 m-2 border border-black">
+  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">New Products</h4>
 
   @if (newProducts && newProducts.length > 0) {
   <div class="flex flex-wrap gap-4">
