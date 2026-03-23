@@ -17,13 +17,17 @@
       </div>
 
       <div class="footer-section">
-        <h3>Categories</h3>
-        <ul>
-          <li><a href="#">Electronics</a></li>
-          <li><a href="#">Fashion</a></li>
-          <li><a href="#">Home & Living</a></li>
-          <li><a href="#">Books</a></li>
-        </ul>
+        <div class="category-bar">
+          <ul class="category-menu">
+            @for (category of categoryList; track category._id) {
+            <li>
+              <a href="#">{{ category.name }}</a>
+            </li>
+            } @empty {
+            <li>There are no items.</li>
+            }
+          </ul>
+        </div>
       </div>
 
       <div class="footer-section">

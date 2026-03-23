@@ -3,6 +3,8 @@
 // components according to the Material 3 design spec.
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
+@use 'ngx-owl-carousel-o/lib/styles/scss/owl.carousel';
+@use 'ngx-owl-carousel-o/lib/styles/scss/owl.theme.default' as owl-theme;
 @use '@angular/material' as mat;
 @use 'tailwindcss' as *;
 html {
@@ -44,3 +46,5 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+
