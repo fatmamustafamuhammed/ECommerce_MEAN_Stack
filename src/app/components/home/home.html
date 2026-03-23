@@ -6,11 +6,10 @@
         <div style="display: flex; flex-direction: column; height: 400px;">
           <div style="flex: 3; overflow: hidden;">
             <img title="img" [src]="(item.images && item.images[0]) || 'assets/images/default-product.png'"
-              [alt]="item.name || 'Banner image'" style="width: 100%; height: 100%; object-fit: cover;">
+              [alt]="item.name || 'Banner image'" style="width: 80%; height: 100%; object-fit: cover;">
           </div>
 
-          <div
-            style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; background: #f9fafb;">
+          <div style="flex: 1; display: flex; align-items: center; padding: 5px; background: #f9fafb;">
             <span style="font-size: 18px; font-weight: bold; text-align: center;">{{item.name}}</span>
           </div>
         </div>
@@ -22,7 +21,7 @@
 
 <!-- Featured Products Section -->
 <div class="p-3">
-  <h4 class="text-2xl font-bold pb-2">Featured Products</h4>
+  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center">Featured Products</h4>
 
   @if (featuredProducts && featuredProducts.length > 0) {
   <div class="flex flex-wrap gap-4">
@@ -38,7 +37,7 @@
 
 <!-- New Products Section -->
 <div class="p-3 mt-6">
-  <h4 class="text-2xl font-bold pb-2">New Products</h4>
+  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center">New Products</h4>
 
   @if (newProducts && newProducts.length > 0) {
   <div class="flex flex-wrap gap-4">

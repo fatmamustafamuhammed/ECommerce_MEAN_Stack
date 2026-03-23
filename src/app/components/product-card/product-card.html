@@ -1,7 +1,7 @@
 <div class="max-w-sm rounded overflow-hidden shadow-lg flex flex-col h-96">
-  <div class="h-1/2 overflow-hidden bg-gray-100">
-    <img title="image" class="w-full h-full object-cover" [src]="getProductImage()" [alt]="product.name"
-      (error)="onImageError($event)">
+  <div class="h-1/2 overflow-hidden bg-gray-100 flex items-center justify-center">
+    <img title="image" style="width: 50%; height: auto; object-fit: cover;" [src]="getProductImage()"
+      [alt]="product.name" (error)="onImageError($event)">
   </div>
 
   <div class="px-6 py-4 flex-1">
