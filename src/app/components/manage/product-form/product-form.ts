@@ -9,13 +9,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, catchError, of } from 'rxjs';
 import { NotificationService } from '../../../Shared/Services/notification-service';
 import { ConfirmDialogService } from '../../../Shared/Services/confirm-dialog-service';
 import { ProductService } from '../../../services/product';
 import { CategoryService } from '../../../services/category';
 import { ProductModel } from '../../../Models/product';
-import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-product-form',
@@ -30,7 +30,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatChipsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
   ],
   templateUrl: './product-form.html',
   styleUrls: ['./product-form.scss'],
@@ -66,6 +66,12 @@ export class ProductForm implements OnInit {
   newImageUrl = signal('');
   uploading = signal(false);
 
+  // Separate storage for images
+  existingImages = signal<string[]>([]);
+  newImagePreviews = signal<string[]>([]);
+  localImageFiles = signal<File[]>([]);
+  deletedImages = signal<string[]>([]);
+
   ngOnInit(): void {
     this.loadCategories();
 
@@ -99,10 +105,15 @@ export class ProductForm implements OnInit {
             this.description.set(product.description || '');
             this.price.set(product.price || null);
             this.discount.set(product.discount || null);
-            this.images.set(product.images || []);
+            this.existingImages.set(product.images || []);
             this.categoryId.set(product.categoryId || '');
             this.isFeatured.set(product.isFeatured || false);
             this.isnew.set(product.isnew || false);
+
+            this.deletedImages.set([]);
+            this.updateDisplayImages();
+
+            console.log('Loaded product with images:', this.existingImages());
           } else {
             this.notification.error('Product not found');
             this.navigateBack();
@@ -120,7 +131,8 @@ export class ProductForm implements OnInit {
     if (this.newImageUrl() && this.newImageUrl().trim()) {
       const url = this.newImageUrl().trim();
       if (this.isValidUrl(url)) {
-        this.images.update((current) => [...current, url]);
+        this.existingImages.update((current) => [...current, url]);
+        this.updateDisplayImages();
         this.newImageUrl.set('');
       } else {
         this.notification.error('Please enter a valid URL');
@@ -129,7 +141,27 @@ export class ProductForm implements OnInit {
   }
 
   removeImage(index: number): void {
-    this.images.update((current) => current.filter((_, i) => i !== index));
+    console.log('Removing image at index:', index);
+
+    if (index < this.existingImages().length) {
+      const imageToDelete = this.existingImages()[index];
+      console.log('Deleting existing image:', imageToDelete);
+
+      if (this.isEdit() && this.id()) {
+        this.deletedImages.update((current) => [...current, imageToDelete]);
+        this.notification.info('Image will be deleted when you save');
+        console.log('Marked for deletion:', imageToDelete);
+      }
+
+      this.existingImages.update((current) => current.filter((_, i) => i !== index));
+    } else {
+      const newIndex = index - this.existingImages().length;
+      console.log('Removing new image preview at index:', newIndex);
+      this.newImagePreviews.update((current) => current.filter((_, i) => i !== newIndex));
+      this.localImageFiles.update((current) => current.filter((_, i) => i !== newIndex));
+    }
+
+    this.updateDisplayImages();
   }
 
   private isValidUrl(url: string): boolean {
@@ -143,68 +175,143 @@ export class ProductForm implements OnInit {
 
   onFilesSelected(event: any): void {
     const files: FileList = event.target.files;
-
     if (files.length === 0) return;
-
-    this.uploading.set(true);
-    const formData = new FormData();
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         this.notification.error(`${file.name} is not an image file`);
         continue;
       }
 
-      // Validate file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
         this.notification.error(`${file.name} exceeds 5MB limit`);
         continue;
       }
 
-      formData.append('images', file);
+      this.localImageFiles.update((current) => [...current, file]);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.newImagePreviews.update((current) => [...current, e.target?.result as string]);
+        this.updateDisplayImages();
+      };
+      reader.readAsDataURL(file);
     }
 
-    this.productService
-      .uploadImages(formData)
-      .pipe(
-        finalize(() => {
-          this.uploading.set(false);
-          // Clear file input
-          if (this.fileInput) {
-            this.fileInput.nativeElement.value = '';
-          }
-        }),
-      )
-      .subscribe({
-        next: (response: any) => {
-          // Assuming server returns array of image URLs
-          const imageUrls = response.imageUrls || response;
-          this.images.update((current) => [...current, ...imageUrls]);
-          this.notification.success('Images uploaded successfully');
-        },
-        error: (error) => {
-          this.notification.error('Failed to upload images');
-          console.error('Upload error:', error);
-        },
-      });
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
-  onSubmit(): void {
+  private updateDisplayImages(): void {
+    this.images.set([...this.existingImages(), ...this.newImagePreviews()]);
+  }
+
+  async onSubmit(): Promise<void> {
     if (!this.isValid()) return;
 
     this.submitting.set(true);
     this.error.set(null);
 
+    try {
+      console.log('Starting submit process...');
+      console.log('Existing images:', this.existingImages());
+      console.log('New files to upload:', this.localImageFiles().length);
+      console.log('Images marked for deletion:', this.deletedImages());
+
+      // Step 1: Upload new images first (if any)
+      let uploadedImageUrls: string[] = [];
+      if (this.localImageFiles().length > 0) {
+        console.log('Uploading new images...');
+        uploadedImageUrls = await this.uploadImagesBeforeSubmit();
+        console.log('Uploaded images:', uploadedImageUrls);
+      }
+
+      // Step 2: Prepare final images list
+      const finalImages = [...this.existingImages(), ...uploadedImageUrls];
+      console.log('Final images to save:', finalImages);
+
+      // Step 3: Save product
+      console.log('Saving product...');
+      await this.saveProduct(finalImages);
+      console.log('Product saved successfully');
+
+      // Step 4: Delete marked images after product is saved
+      if (this.isEdit() && this.deletedImages().length > 0) {
+        console.log('Deleting marked images...');
+        await this.deleteMarkedImages();
+        console.log('Images deleted successfully');
+      }
+
+      this.notification.success(
+        this.isEdit() ? 'Product updated successfully!' : 'Product added successfully!',
+      );
+      this.navigateBack();
+    } catch (error) {
+      console.error('Error in submit process:', error);
+      this.submitting.set(false);
+      this.notification.error('Failed to process product');
+    }
+  }
+
+  private async uploadImagesBeforeSubmit(): Promise<string[]> {
+    const formData = new FormData();
+
+    this.localImageFiles().forEach((file) => {
+      formData.append('images', file);
+    });
+
+    return new Promise((resolve, reject) => {
+      this.productService.uploadImages(formData).subscribe({
+        next: (response: any) => {
+          const newImageUrls = response.imageUrls || response;
+          resolve(newImageUrls);
+        },
+        error: (error) => {
+          console.error('Upload error:', error);
+          reject(error);
+        },
+      });
+    });
+  }
+
+  private async deleteMarkedImages(): Promise<void> {
+    const productId = this.id();
+    console.log('Deleting images for product ID:', productId);
+
+    for (const imageUrl of this.deletedImages()) {
+      console.log('Attempting to delete image:', imageUrl);
+      try {
+        const result = await this.productService
+          .deleteImage(productId, imageUrl)
+          .pipe(
+            catchError((error) => {
+              console.error(`Failed to delete image: ${imageUrl}`, error);
+              return of(null);
+            }),
+          )
+          .toPromise();
+
+        console.log('Delete result:', result);
+      } catch (error) {
+        console.error(`Error deleting image ${imageUrl}:`, error);
+      }
+    }
+
+    console.log('All deletions attempted');
+    this.deletedImages.set([]);
+  }
+
+  private async saveProduct(images: string[]): Promise<void> {
     const productData: ProductModel = {
       name: this.name(),
       shortDescription: this.shortDescription(),
       description: this.description(),
       price: this.price() ?? 0,
       discount: this.discount() ?? 0,
-      images: this.images(),
+      images: images,
       categoryId: this.categoryId(),
       isFeatured: this.isFeatured(),
       isnew: this.isnew(),
@@ -214,20 +321,22 @@ export class ProductForm implements OnInit {
       ? this.productService.updateProduct(this.id(), productData)
       : this.productService.addProduct(productData);
 
-    action.pipe(finalize(() => this.submitting.set(false))).subscribe({
-      next: () => {
-        this.notification.success(
-          this.isEdit() ? 'Product updated successfully!' : 'Product added successfully!',
-        );
-        this.navigateBack();
-      },
-      error: (error) => {
-        const message =
-          error.error?.message ||
-          (this.isEdit() ? 'Failed to update product' : 'Failed to add product');
-        this.error.set(message);
-        this.notification.error(message);
-      },
+    return new Promise((resolve, reject) => {
+      action.subscribe({
+        next: (response: any) => {
+          console.log('Save response:', response);
+          if (!this.isEdit() && response && response._id) {
+            this.id.set(response._id);
+            this.isEdit.set(true);
+            console.log('New product ID set:', response._id);
+          }
+          resolve(response);
+        },
+        error: (error) => {
+          console.error('Save error:', error);
+          reject(error);
+        },
+      });
     });
   }
 
@@ -253,7 +362,9 @@ export class ProductForm implements OnInit {
       this.images().length ||
       this.categoryId() ||
       this.isFeatured() ||
-      this.isnew()
+      this.isnew() ||
+      this.deletedImages().length > 0 ||
+      this.localImageFiles().length > 0
     );
   }
 
@@ -285,7 +396,6 @@ export class ProductForm implements OnInit {
     this.router.navigate(['/admin/products']);
   }
 
-  // Helper methods for template
   getPageTitle(): string {
     if (this.loading()) return 'Loading...';
     return this.isEdit() ? 'Edit Product' : 'Add New Product';
@@ -296,5 +406,21 @@ export class ProductForm implements OnInit {
       return this.isEdit() ? 'Updating...' : 'Adding...';
     }
     return this.isEdit() ? 'Update Product' : 'Add Product';
+  }
+
+  async testDeleteImage(): Promise<void> {
+    if (this.deletedImages().length > 0) {
+      console.log('Testing delete for:', this.deletedImages());
+      for (const imageUrl of this.deletedImages()) {
+        try {
+          const result = await this.productService.deleteImage(this.id(), imageUrl).toPromise();
+          console.log('Delete result:', result);
+        } catch (error) {
+          console.error('Delete failed:', error);
+        }
+      }
+    } else {
+      console.log('No images marked for deletion');
+    }
   }
 }

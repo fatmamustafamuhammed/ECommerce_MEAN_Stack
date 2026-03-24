@@ -68,7 +68,7 @@ export class Products implements OnInit {
         sortable: true,
         width: '200px',
       },
-       {
+      {
         name: 'isFeatured',
         property: 'isFeatured',
         sortable: true,
@@ -80,7 +80,6 @@ export class Products implements OnInit {
         sortable: true,
         width: '100px',
       },
-
     ],
     actions: this.getTableActions(),
   };
@@ -143,12 +142,13 @@ export class Products implements OnInit {
   private performDelete(id: string): void {
     this.deletingId.set(id);
 
+    // Note: The backend will handle deleting images automatically now
     this.productService
       .deleteProductById(id)
       .pipe(finalize(() => this.deletingId.set(null)))
       .subscribe({
         next: () => {
-          this.notification.success('Product deleted successfully!');
+          this.notification.success('Product and its images deleted successfully!');
           this.loadProducts();
         },
         error: (error) => {

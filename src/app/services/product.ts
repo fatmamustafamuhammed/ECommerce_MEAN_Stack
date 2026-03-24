@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, tap } from 'rxjs';
+import { Observable, catchError, of, tap } from 'rxjs';
 import { ProductModel } from '../Models/product';
 import { environment } from '../../environment/environment';
 
@@ -96,7 +96,6 @@ export class ProductService {
     );
   }
 
-  // Optional: Keep the old methods if needed for backward compatibility
   addProductSimple(name: string): Observable<ProductModel> {
     return this.addProduct({
       name,
@@ -106,8 +105,8 @@ export class ProductService {
       discount: 0,
       images: [],
       categoryId: '',
-      isFeatured:false,
-      isnew:false
+      isFeatured: false,
+      isnew: false,
     } as ProductModel);
   }
 
@@ -143,12 +142,22 @@ export class ProductService {
     return this.http.post(`${this.baseUrl}/product/upload`, formData);
   }
 
-  // State management methods
-  clearError(): void {
-    this.error.set(null);
-  }
+  deleteImage(productId: string, imageUrl: string): Observable<any> {
+    if (!productId || productId === 'temp' || productId === 'undefined' || productId === 'null') {
+      console.warn('Invalid productId for image deletion:', productId);
+      return of({ message: 'Skipped deletion - invalid product ID' });
+    }
 
-  setLoading(isLoading: boolean): void {
-    this.loading.set(isLoading);
+    const encodedUrl = encodeURIComponent(imageUrl);
+    const url = `${this.baseUrl}/product/delete-image/${productId}/${encodedUrl}`;
+    console.log('DELETE Request URL:', url);
+
+    return this.http.delete(url).pipe(
+      tap((response) => console.log('Delete response:', response)),
+      catchError((error) => {
+        console.error('Delete error:', error);
+        throw error;
+      }),
+    );
   }
 }
