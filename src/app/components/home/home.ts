@@ -3,10 +3,11 @@ import { Component, inject } from '@angular/core';
 import { CustomerService } from '../../services/customer';
 import { ProductCard } from '../product-card/product-card';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [ProductCard, CarouselModule],
+  imports: [ProductCard, CarouselModule, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -25,6 +26,7 @@ export class Home {
   newProducts: ProductModel[] = [];
   featuredProducts: ProductModel[] = [];
   bannerImages: ProductModel[] = [];
+
   ngOnInit() {
     this.customerService.getFeaturedProducts().subscribe((result) => {
       this.featuredProducts = result;

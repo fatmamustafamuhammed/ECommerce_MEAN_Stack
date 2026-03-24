@@ -1,15 +1,12 @@
 <header class="header">
   <div class="container">
     <div class="top-bar">
-      <div class="logo" (click)="onLogoClick()">
+      <div class="logo cursor-pointer" routerLink="/">
         Shop<span>Hub</span>
       </div>
 
       <div class="search-section">
-        <input type="text" class="search-input" placeholder="Search products..." (keyup.enter)="onSearch()" />
-        <button type="button" class="search-button" (click)="onSearch()">
-          Search
-        </button>
+        <input type="text" class="search-input" placeholder="Search products..." (keyup.enter)="onSearch($event)" />
       </div>
 
       <div class="profile-link" (click)="onProfileClick()">
@@ -18,10 +15,10 @@
     </div>
 
     <div class="category-bar">
-      <ul class="category-menu">
+      <ul class="category-menu cursor-pointer">
         @for (category of categoryList; track category._id) {
         <li>
-          <a href="#">{{ category.name }}</a>
+          <a (click)="searchCategory(category._id!)">{{ category.name }}</a>
         </li>
         } @empty {
         <li>There are no items.</li>

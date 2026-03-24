@@ -3,7 +3,8 @@
     @for (item of bannerImages; track $index) {
     <ng-template carouselSlide>
       <div class="carousel-slide">
-        <div style="display: flex; flex-direction: column; height: 400px;">
+        <div style="display: flex; flex-direction: column; height: 400px;" [routerLink]="'product/'+item._id"
+          class="cursor-pointer">
           <div style="flex: 3; overflow: hidden;">
             <img title="img" [src]="(item.images && item.images[0]) || 'assets/images/default-product.png'"
               [alt]="item.name || 'Banner image'" style="width: 70%; height: 100%; object-fit: cover;">
@@ -21,7 +22,8 @@
 
 <!-- Featured Products Section -->
 <div class="p-5 m-2 border border-black">
-  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">Featured Products</h4>
+  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">Featured Products
+  </h4>
 
   @if (featuredProducts && featuredProducts.length > 0) {
   <div class="flex flex-wrap gap-4">
