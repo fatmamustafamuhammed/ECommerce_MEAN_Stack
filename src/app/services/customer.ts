@@ -4,6 +4,7 @@ import { ProductModel } from '../Models/product';
 import { environment } from '../../environment/environment';
 import { catchError, Observable, tap } from 'rxjs';
 import { CategoryModel } from '../Models/category';
+import { BrandModel } from '../Models/brand';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,8 @@ export class CustomerService {
   // State management
   private products = signal<ProductModel[]>([]);
   private categories = signal<CategoryModel[]>([]);
+  private brands = signal<BrandModel[]>([]);
+
   private loading = signal<boolean>(false);
   private error = signal<string | null>(null);
 
@@ -68,6 +71,23 @@ export class CustomerService {
       }),
       catchError((error) => {
         this.error.set('Failed to load featured Categories');
+        this.loading.set(false);
+        throw error;
+      }),
+    );
+  }
+
+  getBrands(): Observable<BrandModel[]> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.get<BrandModel[]>(`${this.baseUrl}/customer/brands`).pipe(
+      tap((brands) => {
+        this.brands.set(brands);
+        this.loading.set(false);
+      }),
+      catchError((error) => {
+        this.error.set('Failed to load featured Brands');
         this.loading.set(false);
         throw error;
       }),
