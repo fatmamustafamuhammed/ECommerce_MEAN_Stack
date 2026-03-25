@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BrandService } from '../../services/brand';
 import { BrandModel } from '../../Models/brand';
+import { FilterStateService } from '../../Shared/Services/Filter-State-service';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,7 @@ export class Header implements OnInit {
   brandList: BrandModel[] = [];
   authService = inject(AuthService);
   router = inject(Router);
+  filterStateService = inject(FilterStateService);
 
   private searchSubject = new Subject<string>();
 
@@ -69,6 +71,15 @@ export class Header implements OnInit {
   searchbrand(id: string) {
     this.router.navigate(['/products'], {
       queryParams: { brandId: id },
+    });
+  }
+
+  clearAllFilters() {
+    console.log('Header: Clearing all filters');
+    this.filterStateService.clearAllFilters();
+    this.router.navigate(['/products'], {
+      queryParams: {},
+      queryParamsHandling: '',
     });
   }
 

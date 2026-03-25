@@ -1,13 +1,15 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CustomerService } from '../../services/customer';
 import { ProductModel } from '../../Models/product';
 import { ProductCard } from '../product-card/product-card';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatSelectModule } from '@angular/material/select';
 import { CategoryModel } from '../../Models/category';
 import { BrandModel } from '../../Models/brand';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { FilterStateService } from '../../Shared/Services/Filter-State-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -17,6 +19,8 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class ProductList implements OnInit {
   customerService = inject(CustomerService);
+  router = inject(Router);
+  filterStateService = inject(FilterStateService);
   searchTerm: string = '';
   categoryId: string = '';
   sortBy: string = '';
@@ -29,32 +33,96 @@ export class ProductList implements OnInit {
   categories: CategoryModel[] = [];
   brands: BrandModel[] = [];
   isNext: boolean = true;
+  cdr = inject(ChangeDetectorRef);
+
+  private clearFiltersSubscription: Subscription = new Subscription();
 
   ngOnInit() {
+    // Load categories and brands
     this.customerService.getCategories().subscribe((result) => {
       this.categories = result;
     });
+
     this.customerService.getBrands().subscribe((result) => {
       this.brands = result;
     });
 
+    // Subscribe to query params
     this.route.queryParams.subscribe((params) => {
-      console.log('Query params:', params);
+      console.log('Query params received:', params);
 
-      // Match the parameter name from header
+      // Update filters from URL
       this.searchTerm = params['search'] || '';
       this.categoryId = params['categoryId'] || '';
-      this.sortBy = params['sortBy'] || '';
       this.brandId = params['brandId'] || '';
+      this.sortBy = params['sortBy'] || '';
+      this.sortOrder = params['sortOrder'] ? parseInt(params['sortOrder']) : -1;
       this.page = params['page'] ? parseInt(params['page']) : 1;
 
-      console.log('Search term:', this.searchTerm);
-      console.log('Category ID:', this.categoryId);
+      console.log('Updated filters:', {
+        searchTerm: this.searchTerm,
+        categoryId: this.categoryId,
+        brandId: this.brandId,
+      });
 
       this.getProducts();
     });
+
+    // Subscribe to clear filters event
+    this.clearFiltersSubscription = this.filterStateService.clearFilters$.subscribe(
+      (shouldClear) => {
+        if (shouldClear) {
+          console.log('ProductList: Received clear filters event');
+          this.resetAllFilters();
+        }
+      },
+    );
   }
 
+  ngOnDestroy() {
+    if (this.clearFiltersSubscription) {
+      this.clearFiltersSubscription.unsubscribe();
+    }
+  }
+
+  resetAllFilters() {
+    console.log('Resetting all filters');
+
+    // Clear URL params first
+    this.router
+      .navigate(['/products'], {
+        queryParams: {},
+        queryParamsHandling: '',
+      })
+      .then(() => {
+        // After navigation, reset all properties
+        this.searchTerm = '';
+        this.categoryId = '';
+        this.brandId = '';
+        this.sortBy = '';
+        this.sortOrder = -1;
+        this.page = 1;
+
+        console.log('Filters reset to:', {
+          categoryId: this.categoryId,
+          brandId: this.brandId,
+        });
+
+        // Force UI update by reassigning the arrays
+        const tempCategories = [...this.categories];
+        this.categories = [];
+        this.cdr.detectChanges();
+        this.categories = tempCategories;
+
+        const tempBrands = [...this.brands];
+        this.brands = [];
+        this.cdr.detectChanges();
+        this.brands = tempBrands;
+
+        this.cdr.detectChanges();
+        this.getProducts();
+      });
+  }
   getProducts() {
     console.log('Calling getProducts with:', {
       searchTerm: this.searchTerm,
@@ -106,5 +174,10 @@ export class ProductList implements OnInit {
   pageChange(page: number) {
     this.page = page;
     this.getProducts();
+  }
+
+  clearAllFilters() {
+    console.log('ProductList: Manual clear all filters');
+    this.resetAllFilters();
   }
 }
