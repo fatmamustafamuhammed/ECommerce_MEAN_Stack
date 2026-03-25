@@ -12,56 +12,16 @@ import { Register } from './components/register/register';
 import { Login } from './components/login/login';
 import { authGuard } from './core/auth-guard';
 import { AdminDashboard } from './components/manage/admin-dashboard/admin-dashboard';
+import { adminGuard } from './core/admin-guard';
+import { CustomerProfile } from './components/customer-profile/customer-profile';
 
 export const routes: Routes = [
+  // Auth Guard
   {
     path: '',
     component: Home,
     canActivate: [authGuard],
   },
-  {
-    path: 'admin/admin-dashboard',
-    component: AdminDashboard,
-  },
-  {
-    path: 'admin/categories',
-    component: Categories,
-  },
-  {
-    path: 'admin/categories/add',
-    component: CategoryForm,
-  },
-  {
-    path: 'admin/categories/:id',
-    component: CategoryForm,
-  },
-  ////////////////////////////////
-  {
-    path: 'admin/brands',
-    component: Brands,
-  },
-  {
-    path: 'admin/brands/add',
-    component: BrandForm,
-  },
-  {
-    path: 'admin/brands/:id',
-    component: BrandForm,
-  },
-  ////////////////////////////////
-  {
-    path: 'admin/products',
-    component: Products,
-  },
-  {
-    path: 'admin/products/add',
-    component: ProductForm,
-  },
-  {
-    path: 'admin/products/:id',
-    component: ProductForm,
-  },
-  ////////////////////////////////
   {
     path: 'products',
     component: ProductList,
@@ -71,6 +31,65 @@ export const routes: Routes = [
     path: 'product/:id',
     component: ProductDetails,
     canActivate: [authGuard],
+  },
+  {
+    path: 'profile',
+    component: CustomerProfile,
+    canActivate: [authGuard],
+  },
+
+  ////////////////////////////////
+
+  // Admin Guard
+  {
+    path: 'admin/admin-dashboard',
+    component: AdminDashboard,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/categories',
+    component: Categories,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/categories/add',
+    component: CategoryForm,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/categories/:id',
+    component: CategoryForm,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/brands',
+    component: Brands,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/brands/add',
+    component: BrandForm,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/brands/:id',
+    component: BrandForm,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/products',
+    component: Products,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/products/add',
+    component: ProductForm,
+    canActivate: [adminGuard],
+  },
+  {
+    path: 'admin/products/:id',
+    component: ProductForm,
+    canActivate: [adminGuard],
   },
   ////////////////////////////////
   {

@@ -200,12 +200,12 @@ $gray-border: #e9ecef;
     cursor: pointer;
     padding: 0.5rem 1rem;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    // background: rgba(255, 255, 255, 0.1);
     font-weight: 500;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
+    // &:hover {
+      // background: rgba(255, 255, 255, 0.2);
+    // }
   }
 
   .logout-link {

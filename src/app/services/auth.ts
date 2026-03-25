@@ -72,6 +72,14 @@ export class AuthService {
     return false;
   }
 
+  get isAdmin() {
+    let userData = localStorage.getItem('user');
+    if (userData) {
+      return JSON.parse(userData).isAdmin;
+    }
+    return false;
+  }
+
   get userName() {
     let userData = localStorage.getItem('user');
     if (userData) {
@@ -80,7 +88,15 @@ export class AuthService {
     return null;
   }
 
-  logout(){
+  get userEmail() {
+    let userData = localStorage.getItem('user');
+    if (userData) {
+      return JSON.parse(userData).email;
+    }
+    return null;
+  }
+
+  logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   }
