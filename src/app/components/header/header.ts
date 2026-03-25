@@ -1,7 +1,8 @@
 import { Router, RouterLink } from '@angular/router';
 import { CategoryModel } from '../../Models/category';
-import { CategoryService } from './../../services/category';
 import { Component, inject } from '@angular/core';
+import { AuthService } from '../../services/auth';
+import { CustomerService } from '../../services/customer';
 
 @Component({
   selector: 'app-header',
@@ -10,17 +11,18 @@ import { Component, inject } from '@angular/core';
   styleUrl: './header.scss',
 })
 export class Header {
-  categoryService = inject(CategoryService);
+  customerService = inject(CustomerService);
   categoryList: CategoryModel[] = [];
+  authService = inject(AuthService);
   router = inject(Router);
 
   ngOnInit() {
-    this.categoryService.getCategories().subscribe((result) => {
+    this.customerService.getCategories().subscribe((result) => {
       this.categoryList = result;
     });
   }
 
-  onSearch(e: any) {
+  onSearchClick(e: any) {
     if (e.target.value) {
       this.router.navigateByUrl('/products?search=' + e.target.value);
     }
@@ -33,5 +35,9 @@ export class Header {
   onProfileClick() {
     console.log('Profile clicked');
     // Navigate to profile page
+  }
+  onLogout() {
+    this.authService.logout();
+    this.router.navigateByUrl('/login');
   }
 }

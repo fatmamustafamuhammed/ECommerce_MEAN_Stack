@@ -3,17 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RegisterData } from '../../Models/auth';
 import { AuthService } from '../../services/auth';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
 })
 export class Register {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  router = inject(Router);
 
   registerForm: FormGroup;
   showPassword = false;
@@ -75,8 +77,8 @@ export class Register {
 
         // Redirect after 2 seconds
         setTimeout(() => {
-          // this.router.navigate(['/login']);
-        }, 2000);
+          this.router.navigate(['/login']);
+        }, 3000);
       },
       error: (error) => {
         this.isLoading = false;

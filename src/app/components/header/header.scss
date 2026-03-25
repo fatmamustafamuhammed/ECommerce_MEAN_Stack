@@ -19,7 +19,7 @@ $gray-border: #e9ecef;
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 2rem 2rem;
 }
 
 .top-bar {
@@ -83,21 +83,6 @@ $gray-border: #e9ecef;
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
-  }
-}
-
-.profile-link {
-  color: $white;
-  cursor: pointer;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.1);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
   }
 }
 
@@ -202,5 +187,37 @@ $gray-border: #e9ecef;
   .search-section .search-button {
     padding: 0.8rem 1rem;
     font-size: 0.85rem;
+  }
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .profile-link {
+    color: $white;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 500;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .logout-link {
+    color: #ee6565;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 500;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
   }
 }

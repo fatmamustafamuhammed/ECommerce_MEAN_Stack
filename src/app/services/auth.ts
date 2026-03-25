@@ -41,6 +41,50 @@ export class AuthService {
     );
   }
 
+  loginUser(credentials: { email: string; password: string }): Observable<AuthResponse> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, credentials).pipe(
+      tap((response) => {
+        console.log('Login successful:', response);
+        this.loading.set(false);
+        // Store token if needed
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+      }),
+      catchError((error) => {
+        const errorMessage = error.error?.message || 'Login failed. Please try again.';
+        this.error.set(errorMessage);
+        this.loading.set(false);
+        return throwError(() => new Error(errorMessage));
+      }),
+    );
+  }
+
+  get isLoggedIn() {
+    let token = localStorage.getItem('token');
+    if (token) {
+      return true;
+    }
+    return false;
+  }
+
+  get userName() {
+    let userData = localStorage.getItem('user');
+    if (userData) {
+      return JSON.parse(userData).name;
+    }
+    return null;
+  }
+
+  logout(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+
   // State management methods
   clearError(): void {
     this.error.set(null);

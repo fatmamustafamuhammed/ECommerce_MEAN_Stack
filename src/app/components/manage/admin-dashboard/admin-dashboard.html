@@ -1,0 +1,25 @@
+<div class="admin-dashboard">
+  <div class="container">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+
+    <div class="buttons-container">
+      <!-- Categories Button -->
+      <button mat-raised-button color="primary" (click)="goToCategories()">
+        <mat-icon>category</mat-icon>
+        Manage Categories
+      </button>
+
+      <!-- Brands Button -->
+      <button mat-raised-button color="accent" (click)="goToBrands()">
+        <mat-icon>branding_watermark</mat-icon>
+        Manage Brands
+      </button>
+
+      <!-- Products Button -->
+      <button mat-raised-button color="warn" (click)="goToProducts()">
+        <mat-icon>inventory_2</mat-icon>
+        Manage Products
+      </button>
+    </div>
+  </div>
+</div>

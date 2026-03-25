@@ -25,6 +25,7 @@ export class Home {
   customerService = inject(CustomerService);
   newProducts: ProductModel[] = [];
   featuredProducts: ProductModel[] = [];
+  categories: any[] = [];
   bannerImages: ProductModel[] = [];
 
   ngOnInit() {
@@ -38,6 +39,16 @@ export class Home {
       this.newProducts = result;
       console.log(this.newProducts);
       this.bannerImages.push(...result);
+    });
+
+    this.customerService.getCategories().subscribe({
+      next: (categories) => {
+        console.log('Categories loaded:', categories);
+        this.categories = categories;
+      },
+      error: (err) => {
+        console.error('Error loading categories:', err);
+      },
     });
   }
 

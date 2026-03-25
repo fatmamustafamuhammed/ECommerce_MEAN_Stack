@@ -1,19 +1,33 @@
 <header class="header">
   <div class="container">
+    <!-- Top Bar with Logo, Search, and Profile -->
     <div class="top-bar">
       <div class="logo cursor-pointer" routerLink="/">
         Shop<span>Hub</span>
       </div>
-
+      @if(authService.isLoggedIn){
       <div class="search-section">
-        <input type="text" class="search-input" placeholder="Search products..." (keyup.enter)="onSearch($event)" />
+        <input type="text" class="search-input" placeholder="Search products..."
+          (keyup.enter)="onSearchClick($event)" />
+        <button class="search-button" (click)="onSearchClick($event)">Search</button>
+      </div>
+      }
+
+      <div class="profile-section">
+        @if(authService.isLoggedIn){
+        <a (click)="onProfileClick()" class="profile-link">{{ authService.userName }}</a>
+        }
+        @if(authService.isLoggedIn){
+        <a (click)="onLogout()" class="logout-link">Logout</a>
+        }@else{
+        <a routerLink="/login" class="logout-link">Log in</a>
+        <a routerLink="/register" class="logout-link">Register</a>
+        }
       </div>
 
-      <div class="profile-link" (click)="onProfileClick()">
-        My Account
-      </div>
     </div>
 
+    @if(authService.isLoggedIn){
     <div class="category-bar">
       <ul class="category-menu cursor-pointer">
         @for (category of categoryList; track category._id) {
@@ -25,5 +39,6 @@
         }
       </ul>
     </div>
+    }
   </div>
 </header>

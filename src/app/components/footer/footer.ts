@@ -1,5 +1,6 @@
 import { CategoryModel } from '../../Models/category';
-import { CategoryService } from './../../services/category';
+import { AuthService } from '../../services/auth';
+import { CustomerService } from '../../services/customer';
 import { Component, inject } from '@angular/core';
 @Component({
   selector: 'app-footer',
@@ -9,10 +10,11 @@ import { Component, inject } from '@angular/core';
 })
 export class Footer {
   currentYear: number = new Date().getFullYear();
-  categoryService = inject(CategoryService);
+  customerService = inject(CustomerService);
   categoryList: CategoryModel[] = [];
+  authService = inject(AuthService);
   ngOnInit() {
-    this.categoryService.getCategories().subscribe((result) => {
+    this.customerService.getCategories().subscribe((result) => {
       this.categoryList = result;
     });
   }

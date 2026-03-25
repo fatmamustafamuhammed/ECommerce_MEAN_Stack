@@ -9,11 +9,19 @@ import { ProductForm } from './components/manage/product-form/product-form';
 import { ProductList } from './components/product-list/product-list';
 import { ProductDetails } from './components/product-details/product-details';
 import { Register } from './components/register/register';
+import { Login } from './components/login/login';
+import { authGuard } from './core/auth-guard';
+import { AdminDashboard } from './components/manage/admin-dashboard/admin-dashboard';
 
 export const routes: Routes = [
   {
     path: '',
     component: Home,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'admin/admin-dashboard',
+    component: AdminDashboard,
   },
   {
     path: 'admin/categories',
@@ -57,14 +65,20 @@ export const routes: Routes = [
   {
     path: 'products',
     component: ProductList,
+    canActivate: [authGuard],
   },
   {
     path: 'product/:id',
     component: ProductDetails,
+    canActivate: [authGuard],
   },
   ////////////////////////////////
   {
     path: 'register',
     component: Register,
+  },
+  {
+    path: 'login',
+    component: Login,
   },
 ];
