@@ -13,15 +13,23 @@
   </div>
 
   <div class="px-6 pt-4 pb-2">
-    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-      {{product.price | currency}}
-    </span>
-
-    @if (product.discount) {
-    <span class="inline-block bg-green-200 rounded-full px-3 py-1 text-sm font-semibold text-green-700 mr-2 mb-2">
-      {{product.discount}}% OFF
-    </span>
-    }
+    <div class="space-y-6">
+        <!-- Price -->
+        <div>
+          @if (product.discount > 0) {
+            <div class="flex items-center gap-3">
+              <span class="text-2xl font-bold text-blue-600">
+                ${{ (product.price - (product.price * product.discount / 100)).toFixed(2) }}
+              </span>
+              <span class="text-xl text-gray-500 line-through">${{ product.price }}</span>
+              <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-semibold">
+                -{{ product.discount }}%
+              </span>
+            </div>
+          } @else {
+            <span class="text-2xl font-bold text-blue-600">${{ product.price }}</span>
+          }
+        </div>
 
     <button type="button" (click)="onAddToCart()"
       class="bg-blue-600 text-white font-bold py-2 px-4 border border-blue-700 rounded hover:bg-blue-700 transition-colors w-full mt-2">

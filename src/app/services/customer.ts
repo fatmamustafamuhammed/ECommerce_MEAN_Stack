@@ -17,6 +17,7 @@ export class CustomerService {
   private products = signal<ProductModel[]>([]);
   private categories = signal<CategoryModel[]>([]);
   private brands = signal<BrandModel[]>([]);
+  private product = signal<ProductModel[]>([]);
 
   private loading = signal<boolean>(false);
   private error = signal<string | null>(null);
@@ -70,7 +71,7 @@ export class CustomerService {
         this.loading.set(false);
       }),
       catchError((error) => {
-        this.error.set('Failed to load featured Categories');
+        this.error.set('Failed to load Categories');
         this.loading.set(false);
         throw error;
       }),
@@ -87,7 +88,7 @@ export class CustomerService {
         this.loading.set(false);
       }),
       catchError((error) => {
-        this.error.set('Failed to load featured Brands');
+        this.error.set('Failed to load Brands');
         this.loading.set(false);
         throw error;
       }),
@@ -116,11 +117,28 @@ export class CustomerService {
           this.loading.set(false);
         }),
         catchError((error) => {
-          this.error.set('Failed to load featured Products');
+          this.error.set('Failed to load Products');
           this.loading.set(false);
           throw error;
         }),
       );
+  }
+
+  getProductById(id: string): Observable<ProductModel> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.get<ProductModel>(`${this.baseUrl}/customer/product/${id}`).pipe(
+      tap((product) => {
+        this.product.set([product]);
+        this.loading.set(false);
+      }),
+      catchError((error) => {
+        this.error.set('Failed to load product');
+        this.loading.set(false);
+        throw error;
+      }),
+    );
   }
 
   // State management methods
