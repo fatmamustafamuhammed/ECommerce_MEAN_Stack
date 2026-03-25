@@ -43,5 +43,19 @@
       </ul>
     </div>
     }
+
+    @if(authService.isLoggedIn){
+    <div class="category-bar">
+      <ul class="category-menu cursor-pointer">
+        @for (brand of brandList; track brand._id) {
+        <li>
+          <a (click)="searchbrand(brand._id!)">{{ brand.name }}</a>
+        </li>
+        } @empty {
+        <li>There are no items.</li>
+        }
+      </ul>
+    </div>
+    }
   </div>
 </header>

@@ -1,6 +1,6 @@
 <div class="flex px-10 py-2">
   <div class="w-3/12">
-    <h6>Filters</h6>
+    <h6 class="font-bold text-blue-700 text-2xl">Filters</h6>
     <div class="flex flex-col px-6">
       <div class="w-full p-2 mb-4">
         <mat-form-field class="w-full">
@@ -26,7 +26,7 @@
   </div>
   <div class="flex-1">
     <div class="flex justify-between">
-      <h6>Products</h6>
+      <h6 class="font-bold text-blue-700 text-2xl">Products</h6>
       <mat-form-field class="w-40">
         <mat-label>Order By</mat-label>
         <mat-select (valueChange)="orderChange($event)">
@@ -44,10 +44,10 @@
       }
     </div>
     <div class="flex gap-3 mt-4">
-      <button matButton="outlined" [disabled]="page === 1" (click)="pageChange(page - 1)">
+      <button mat-stroked-button [disabled]="page === 1" (click)="pageChange(page - 1)">
         Previous
       </button>
-      <button matButton="outlined" (click)="pageChange(page + 1)" [disabled]="isNext">
+      <button mat-stroked-button (click)="pageChange(page + 1)" [disabled]="!isNext">
         Next
       </button>
     </div>

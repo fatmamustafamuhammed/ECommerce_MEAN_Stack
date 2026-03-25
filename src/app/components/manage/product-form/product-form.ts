@@ -1,3 +1,4 @@
+import { BrandService } from './../../../services/brand';
 import { Component, OnInit, inject, signal, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -40,6 +41,7 @@ export class ProductForm implements OnInit {
 
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
+  private brandService = inject(BrandService);
   private notification = inject(NotificationService);
   private confirmService = inject(ConfirmDialogService);
   private router = inject(Router);
@@ -54,11 +56,13 @@ export class ProductForm implements OnInit {
   discount = signal<number | null>(null);
   images = signal<string[]>([]);
   categoryId = signal('');
+  brandId = signal('');
   isFeatured = signal(false);
   isnew = signal(false);
 
   // UI state
   categories = signal<any[]>([]);
+  brands = signal<any[]>([]);
   isEdit = signal(false);
   loading = signal(false);
   submitting = signal(false);
@@ -74,6 +78,7 @@ export class ProductForm implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
+    this.loadBrands();
 
     const paramId = this.route.snapshot.params['id'];
     if (paramId) {
@@ -87,6 +92,13 @@ export class ProductForm implements OnInit {
     this.categoryService.getCategories().subscribe({
       next: (categories) => this.categories.set(categories),
       error: (error) => console.error('Error loading categories:', error),
+    });
+  }
+
+  loadBrands(): void {
+    this.brandService.getBrands().subscribe({
+      next: (brands) => this.brands.set(brands),
+      error: (error) => console.error('Error loading brands:', error),
     });
   }
 
@@ -107,6 +119,7 @@ export class ProductForm implements OnInit {
             this.discount.set(product.discount || null);
             this.existingImages.set(product.images || []);
             this.categoryId.set(product.categoryId || '');
+            this.brandId.set(product.brandId || '');
             this.isFeatured.set(product.isFeatured || false);
             this.isnew.set(product.isnew || false);
 
@@ -313,6 +326,7 @@ export class ProductForm implements OnInit {
       discount: this.discount() ?? 0,
       images: images,
       categoryId: this.categoryId(),
+      brandId: this.brandId(),
       isFeatured: this.isFeatured(),
       isnew: this.isnew(),
     };
@@ -361,6 +375,7 @@ export class ProductForm implements OnInit {
       this.discount() ||
       this.images().length ||
       this.categoryId() ||
+      this.brandId() ||
       this.isFeatured() ||
       this.isnew() ||
       this.deletedImages().length > 0 ||
@@ -387,6 +402,10 @@ export class ProductForm implements OnInit {
     }
     if (!this.categoryId()) {
       this.notification.error('Category is required');
+      return false;
+    }
+    if (!this.brandId()) {
+      this.notification.error('Brand is required');
       return false;
     }
     return true;

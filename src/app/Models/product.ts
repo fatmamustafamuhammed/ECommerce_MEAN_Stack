@@ -9,6 +9,7 @@ export interface ProductModel extends BaseModel {
   discount: number;
   images: string[];
   categoryId: string;
+  brandId: string;
   isFeatured: Boolean;
   isnew: Boolean;
 }

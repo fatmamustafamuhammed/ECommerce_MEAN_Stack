@@ -23,7 +23,7 @@ export class ProductList implements OnInit {
   sortOrder: number = -1;
   brandId: string = '';
   page = 1;
-  pageSize = 6;
+  pageSize = 2;
   products: ProductModel[] = [];
   route = inject(ActivatedRoute);
   categories: CategoryModel[] = [];
@@ -66,6 +66,8 @@ export class ProductList implements OnInit {
       pageSize: this.pageSize,
     });
 
+    this.isNext = true;
+
     setTimeout(() => {
       this.customerService
         .getProducts(
@@ -81,12 +83,14 @@ export class ProductList implements OnInit {
           next: (result) => {
             console.log('Products received:', result);
             this.products = result;
-            if (result.length < this.pageSize) {
-              this.isNext = false;
-            }
+
+            this.isNext = result.length === this.pageSize;
+
+            console.log('Is next page available:', this.isNext);
           },
           error: (error) => {
             console.error('Error loading products:', error);
+            this.isNext = false;
           },
         });
     }, 2000);
@@ -101,7 +105,6 @@ export class ProductList implements OnInit {
   }
   pageChange(page: number) {
     this.page = page;
-    this.isNext = true;
     this.getProducts();
   }
 }

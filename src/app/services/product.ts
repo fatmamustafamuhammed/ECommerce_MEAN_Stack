@@ -105,6 +105,7 @@ export class ProductService {
       discount: 0,
       images: [],
       categoryId: '',
+      brandId: '',
       isFeatured: false,
       isnew: false,
     } as ProductModel);

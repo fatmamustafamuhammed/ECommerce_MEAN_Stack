@@ -113,7 +113,27 @@
       </mat-form-field>
     </div>
 
-     <!-- Product Status -->
+    <!-- Brand -->
+    <div class="form-section">
+      <h2>Brand *</h2>
+
+      <mat-form-field class="full-width">
+        <mat-label>Select Brand</mat-label>
+        <mat-select [(ngModel)]="brandId" name="brandId" #brandInput="ngModel" required>
+          <mat-option value="">-- Select a brand --</mat-option>
+          @for (brand of brands(); track brand._id) {
+          <mat-option [value]="brand._id">
+            {{ brand.name }}
+          </mat-option>
+          }
+        </mat-select>
+        @if (brandInput.errors?.['required'] && brandInput.touched) {
+        <mat-error>Brand is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Product Status -->
     <div class="form-section">
       <h2>Product Status</h2>
 

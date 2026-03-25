@@ -5,6 +5,8 @@ import { AuthService } from '../../services/auth';
 import { CustomerService } from '../../services/customer';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { BrandService } from '../../services/brand';
+import { BrandModel } from '../../Models/brand';
 
 @Component({
   selector: 'app-header',
@@ -14,7 +16,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 })
 export class Header implements OnInit {
   customerService = inject(CustomerService);
+  brandService = inject(BrandService);
   categoryList: CategoryModel[] = [];
+  brandList: BrandModel[] = [];
   authService = inject(AuthService);
   router = inject(Router);
 
@@ -23,6 +27,10 @@ export class Header implements OnInit {
   ngOnInit() {
     this.customerService.getCategories().subscribe((result) => {
       this.categoryList = result;
+    });
+
+    this.customerService.getBrands().subscribe((result) => {
+      this.brandList = result;
     });
 
     // Setup search with debounce
@@ -55,6 +63,12 @@ export class Header implements OnInit {
   searchCategory(id: string) {
     this.router.navigate(['/products'], {
       queryParams: { categoryId: id },
+    });
+  }
+
+  searchbrand(id: string) {
+    this.router.navigate(['/products'], {
+      queryParams: { brandId: id },
     });
   }
 
