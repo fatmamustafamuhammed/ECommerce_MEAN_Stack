@@ -74,6 +74,35 @@ export class CustomerService {
     );
   }
 
+  getProducts(
+    searchTerm: string,
+    categoryId: string,
+    sortBy: string,
+    sortOrder: number,
+    brandId: string,
+    page: number,
+    pageSize: number,
+  ): Observable<ProductModel[]> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http
+      .get<
+        ProductModel[]
+      >(`${this.baseUrl}/customer/products?searchTerm=${searchTerm}&categoryId=${categoryId}&sortBy=${sortBy}&sortOrder=${sortOrder}&brandId=${brandId}&page=${page}&pageSize=${pageSize}`)
+      .pipe(
+        tap((products) => {
+          this.products.set(products);
+          this.loading.set(false);
+        }),
+        catchError((error) => {
+          this.error.set('Failed to load featured Products');
+          this.loading.set(false);
+          throw error;
+        }),
+      );
+  }
+
   // State management methods
   clearError(): void {
     this.error.set(null);
