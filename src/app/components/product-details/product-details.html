@@ -1,29 +1,26 @@
-@if (product) {
+@if (product()) {
 <div class="max-w-7xl mx-auto px-4 py-8">
-  <!-- Header -->
   <div class="mb-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ product.name }}</h1>
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ product()!.name }}</h1>
     <div class="flex items-center gap-2 text-sm text-gray-500">
-      <span>Product ID: {{ product._id }}</span>
+      <span>Product ID: {{ product()!._id }}</span>
       <span>•</span>
-      <span>Category: {{ product.categoryId }}</span>
+      <span>Category: {{ product()!.categoryId }}</span>
       <span>•</span>
-      <span>Brand: {{ product.brandId }}</span>
+      <span>Brand: {{ product()!.brandId }}</span>
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-    <!-- Images Section -->
-    @if (product.images.length) {
+    @if (product()!.images.length) {
     <div class="space-y-4">
       <div class="bg-gray-100 rounded-lg overflow-hidden">
-        <img title="img1" [src]="product.images[selectedImage] || product.images[0]" [alt]="product.name"
+        <img title="img1" [src]="product()!.images[selectedImage] || product()!.images[0]" [alt]="product()!.name"
           class="w-full h-96 object-cover transition-all duration-300">
       </div>
       <div class="flex gap-2">
-        @for (image of product.images; track $index) {
-        <img title="img1" [src]="image" [alt]="product.name" (mouseenter)="changeImage($index)"
+        @for (image of product()!.images; track $index) {
+        <img title="img1" [src]="image" [alt]="product()!.name" (mouseenter)="changeImage($index)"
           class="w-20 h-20 object-cover rounded-lg border-2 transition-all duration-200 cursor-pointer"
           [class.border-blue-500]="selectedImage === $index" [class.border-gray-200]="selectedImage !== $index"
           [class.opacity-70]="selectedImage !== $index" [class.scale-105]="selectedImage === $index">
@@ -32,101 +29,100 @@
     </div>
     }
 
-    <!-- Info Section -->
     <div class="space-y-6">
-      <!-- Price -->
-      <div>
-        @if (product.discount > 0) {
-        <div class="flex items-center gap-3">
-          <span class="text-3xl font-bold text-blue-600">
-            ${{ (product.price - (product.price * product.discount / 100)).toFixed(2) }}
-          </span>
-          <span class="text-xl text-gray-500 line-through">${{ product.price }}</span>
-          <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-semibold">
-            -{{ product.discount }}%
-          </span>
-        </div>
-        } @else {
-        <span class="text-3xl font-bold text-blue-600">${{ product.price }}</span>
-        }
+      @if (product()!.discount > 0) {
+      <div class="flex items-center gap-3">
+        <span class="text-3xl font-bold text-blue-600">
+          ${{ (product()!.price - (product()!.price * product()!.discount / 100)).toFixed(2) }}
+        </span>
+        <span class="text-xl text-gray-500 line-through">${{ product()!.price }}</span>
+        <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-semibold">
+          -{{ product()!.discount }}%
+        </span>
       </div>
+      } @else {
+      <span class="text-3xl font-bold text-blue-600">${{ product()!.price }}</span>
+      }
 
-      <!-- Short Description -->
       <div>
         <h3 class="text-lg font-semibold text-red-800 mb-2">Short Description</h3>
-        <p class="text-gray-700">{{ product.shortDescription }}</p>
+        <p class="text-gray-700">{{ product()!.shortDescription }}</p>
       </div>
 
-      <!-- Full Description -->
       <div>
         <h3 class="text-lg font-semibold text-red-800 mb-2">Description</h3>
-        <p class="text-gray-600 leading-relaxed">{{ product.description }}</p>
+        <p class="text-gray-600 leading-relaxed">{{ product()!.description }}</p>
       </div>
 
-      <!-- Badges -->
       <div class="flex gap-2">
-        @if (product.isFeatured) {
-        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
-          Featured
-        </span>
+        @if (product()!.isFeatured) {
+        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">Featured</span>
         }
-        @if (product.isnew) {
-        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-          New Arrival
-        </span>
+        @if (product()!.isnew) {
+        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">New Arrival</span>
         }
       </div>
 
-      <!-- Action Buttons -->
+      <div style="display: flex; gap: 20px;">
+        <button type="button" matFab style="width: 56px; height: 56px;" (click)="addToWishList(product()!)">
+          @if(isInWishList()){
+          <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite</mat-icon>
+          } @else {
+          <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite_border</mat-icon>
+          }
+        </button>
+        <button type="button" matFab style="width: 56px; height: 56px;">
+          <mat-icon style="font-size: 28px; width: 28px; height: 28px;">add_shopping_cart</mat-icon>
+        </button>
+      </div>
+
       <div class="flex gap-4 pt-4">
-        <button class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-          Add to Cart
-        </button>
         <button
-          class="flex-1 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition font-semibold">
-          Buy Now
-        </button>
+          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">Add to
+          Cart</button>
+        <button
+          class="flex-1 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition font-semibold">Buy
+          Now</button>
       </div>
     </div>
   </div>
 
-  <!-- Details Section -->
   <div class="border-t border-gray-200 pt-8">
     <h3 class="text-xl font-bold text-blue-700 mb-4">Product Details</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Product Name</span>
-        <span class="text-gray-900">{{ product.name }}</span>
+        <span class="text-gray-900">{{ product()!.name }}</span>
       </div>
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Price</span>
-        <span class="text-gray-900">${{ product.price }}</span>
+        <span class="text-gray-900">${{ product()!.price }}</span>
       </div>
-      @if (product.discount > 0) {
+      @if (product()!.discount > 0) {
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Discount</span>
-        <span class="text-green-600">{{ product.discount }}% OFF</span>
+        <span class="text-green-600">{{ product()!.discount }}% OFF</span>
       </div>
       }
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Category ID</span>
-        <span class="text-gray-900">{{ product.categoryId }}</span>
+        <span class="text-gray-900">{{ product()!.categoryId }}</span>
       </div>
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Brand ID</span>
-        <span class="text-gray-900">{{ product.brandId }}</span>
+        <span class="text-gray-900">{{ product()!.brandId }}</span>
       </div>
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Product ID</span>
-        <span class="text-gray-900">{{ product._id }}</span>
+        <span class="text-gray-900">{{ product()!._id }}</span>
       </div>
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">Featured</span>
-        <span class="text-gray-900">{{ product.isFeatured ? '✓ Yes' : '✗ No' }}</span>
+        <span class="text-gray-900">{{ product()!.isFeatured ? '✓ Yes' : '✗ No' }}</span>
       </div>
       <div class="flex py-3 border-b">
         <span class="w-32 font-semibold text-gray-600">New Arrival</span>
-        <span class="text-gray-900">{{ product.isnew ? '✓ Yes' : '✗ No' }}</span>
+        <span class="text-gray-900">{{ product()!.isnew ? '✓ Yes' : '✗ No' }}</span>
       </div>
     </div>
   </div>
@@ -140,15 +136,13 @@
 </div>
 }
 
-<!-- New Products Section -->
 <div class="p-5 mt-6 m-2 border border-black">
   <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">Similar Products
   </h4>
-
   @if (similarProducts && similarProducts.length > 0) {
   <div class="flex flex-wrap gap-4">
-    @for (product of similarProducts; track product._id) {
-    <app-product-card [product]="product" (addToCart)="handleAddToCart($event)">
+    @for (similarProduct of similarProducts; track similarProduct._id) {
+    <app-product-card [product]="similarProduct" (addToCart)="handleAddToCart($event)">
     </app-product-card>
     }
   </div>

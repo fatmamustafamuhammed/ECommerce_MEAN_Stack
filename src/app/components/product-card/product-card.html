@@ -1,8 +1,7 @@
-<div class="max-w-sm rounded overflow-hidden shadow-lg flex flex-col h-96 border border-black cursor-pointer"
-  [routerLink]="['/product', product._id]">
+<div class="max-w-sm rounded overflow-hidden shadow-lg flex flex-col h-96 border border-black cursor-pointer">
   <div class="h-1/2 overflow-hidden bg-gray-100 flex items-center justify-center">
     <img title="image" style="width: 50%; height: auto; object-fit: cover;" [src]="getProductImage()"
-      [alt]="product.name" (error)="onImageError($event)">
+      [alt]="product.name" (error)="onImageError($event)" [routerLink]="['/product', product._id]">
   </div>
 
   <div class="px-6 py-4 flex-1">
@@ -32,14 +31,16 @@
       </div>
       <div style="display: flex; justify-content: flex-end; width: 100%; padding: 16px;">
         <div style="display: flex; gap: 20px;">
-          <button type="button" matFab style="width: 56px; height: 56px;">
+          <button type="button" matFab style="width: 56px; height: 56px;" (click)="addToWishList(product)">
+            @if(isInWishList()){
+            <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite</mat-icon>
+            } @else {
             <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite_border</mat-icon>
-            <!-- <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite</mat-icon> -->
+            }
           </button>
 
           <button type="button" matFab style="width: 56px; height: 56px;">
             <mat-icon style="font-size: 28px; width: 28px; height: 28px;">add_shopping_cart</mat-icon>
-            <!-- <mat-icon style="font-size: 28px; width: 28px; height: 28px;">remove_shopping_cart</mat-icon> -->
           </button>
         </div>
       </div>

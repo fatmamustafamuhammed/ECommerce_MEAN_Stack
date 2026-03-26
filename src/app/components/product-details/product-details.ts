@@ -1,14 +1,16 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService } from '../../services/customer';
 import { ProductModel } from '../../Models/product';
 import { ProductCard } from '../product-card/product-card';
 import { Subscription } from 'rxjs';
+import { wishListService } from '../../services/wishList';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [ProductCard],
+  imports: [ProductCard, MatIconModule],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
 })
@@ -16,13 +18,19 @@ export class ProductDetails implements OnInit, OnDestroy {
   customerService = inject(CustomerService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  wishListService = inject(wishListService);
 
-  product!: ProductModel;
+  product = signal<ProductModel | null>(null);
   selectedImage = 0;
   similarProducts: ProductModel[] = [];
-  bannerImages: ProductModel[] = [];
   isLoading = false;
   isLoadingSimilar = false;
+
+  isInWishList = computed(() => {
+    const p = this.product();
+    if (!p?._id) return false;
+    return this.wishListService.wishLists$().some((x) => x._id === p._id);
+  });
 
   private subscription = new Subscription();
 
@@ -30,10 +38,7 @@ export class ProductDetails implements OnInit, OnDestroy {
     this.subscription.add(
       this.route.params.subscribe((params) => {
         const id = params['id'];
-        if (id) {
-          console.log('Loading product with id:', id);
-          this.loadProduct(id);
-        }
+        if (id) this.loadProduct(id);
       }),
     );
   }
@@ -44,14 +49,11 @@ export class ProductDetails implements OnInit, OnDestroy {
 
   loadProduct(id: string) {
     this.isLoading = true;
-
     this.customerService.getProductById(id).subscribe({
       next: (result) => {
-        this.product = result;
-        console.log('Product loaded:', this.product);
+        this.product.set(result);
         this.selectedImage = 0;
         this.isLoading = false;
-
         this.loadSimilarProducts();
       },
       error: (error) => {
@@ -62,18 +64,12 @@ export class ProductDetails implements OnInit, OnDestroy {
   }
 
   loadSimilarProducts() {
-    if (!this.product?.categoryId) {
-      console.warn('No categoryId available');
-      return;
-    }
-
+    const p = this.product();
+    if (!p?.categoryId) return;
     this.isLoadingSimilar = true;
-
-    this.customerService.getProducts('', this.product.categoryId, '', -1, '', 1, 10).subscribe({
+    this.customerService.getProducts('', p.categoryId, '', -1, '', 1, 10).subscribe({
       next: (result) => {
-        this.similarProducts = result.filter((p) => p._id !== this.product._id);
-        console.log('Similar products:', this.similarProducts);
-        this.bannerImages = [...this.similarProducts];
+        this.similarProducts = result.filter((x) => x._id !== p._id);
         this.isLoadingSimilar = false;
       },
       error: (error) => {
@@ -90,6 +86,12 @@ export class ProductDetails implements OnInit, OnDestroy {
 
   handleAddToCart(product: any): void {
     console.log('Adding to cart:', product);
-    // this.cartService.addToCart(product);
+  }
+
+  addToWishList(product: ProductModel) {
+    if (!product._id) return;
+    this.wishListService.toggleWishList(product).subscribe({
+      error: (error) => console.error('Wishlist toggle error:', error),
+    });
   }
 }

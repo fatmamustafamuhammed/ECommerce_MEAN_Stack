@@ -8,10 +8,11 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BrandService } from '../../services/brand';
 import { BrandModel } from '../../Models/brand';
 import { FilterStateService } from '../../Shared/Services/Filter-State-service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink],
+  imports: [RouterLink,MatIconModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })

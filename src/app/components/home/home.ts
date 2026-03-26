@@ -4,6 +4,7 @@ import { CustomerService } from '../../services/customer';
 import { ProductCard } from '../product-card/product-card';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
 import { RouterLink } from '@angular/router';
+// import { wishListService } from '../../services/wishList';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +24,7 @@ export class Home {
     nav: true,
   };
   customerService = inject(CustomerService);
+  // wishListService = inject(wishListService);
   newProducts: ProductModel[] = [];
   featuredProducts: ProductModel[] = [];
   categories: any[] = [];
@@ -50,6 +52,8 @@ export class Home {
         console.error('Error loading categories:', err);
       },
     });
+
+    // this.wishListService.init();
   }
 
   handleAddToCart(product: any): void {

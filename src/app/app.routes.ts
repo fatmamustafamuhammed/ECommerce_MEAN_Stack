@@ -14,6 +14,7 @@ import { authGuard } from './core/auth-guard';
 import { AdminDashboard } from './components/manage/admin-dashboard/admin-dashboard';
 import { adminGuard } from './core/admin-guard';
 import { CustomerProfile } from './components/customer-profile/customer-profile';
+import { Whishlists } from './components/whishlists/whishlists';
 
 export const routes: Routes = [
   // Auth Guard
@@ -35,6 +36,11 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: CustomerProfile,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'whishlists',
+    component: Whishlists,
     canActivate: [authGuard],
   },
 
