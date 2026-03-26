@@ -65,7 +65,7 @@ export class Login {
         // Redirect after 3 seconds
         setTimeout(() => {
           this.router.navigate(['/']);
-        }, 3000);
+        }, 2000);
       },
       error: (error) => {
         this.isLoading = false;

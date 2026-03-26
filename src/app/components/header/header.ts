@@ -1,9 +1,9 @@
 import { Router, RouterLink } from '@angular/router';
 import { CategoryModel } from '../../Models/category';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../services/auth';
 import { CustomerService } from '../../services/customer';
-import { Subject } from 'rxjs';
+import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BrandService } from '../../services/brand';
 import { BrandModel } from '../../Models/brand';
@@ -15,7 +15,7 @@ import { FilterStateService } from '../../Shared/Services/Filter-State-service';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
-export class Header implements OnInit {
+export class Header implements OnInit, OnDestroy {
   customerService = inject(CustomerService);
   brandService = inject(BrandService);
   categoryList: CategoryModel[] = [];
@@ -23,19 +23,24 @@ export class Header implements OnInit {
   authService = inject(AuthService);
   router = inject(Router);
   filterStateService = inject(FilterStateService);
+  private cdr = inject(ChangeDetectorRef);
 
   private searchSubject = new Subject<string>();
+  private authSubscription = new Subscription();
+
+  isLoggedIn = false;
 
   ngOnInit() {
-    this.customerService.getCategories().subscribe((result) => {
-      this.categoryList = result;
+    this.authSubscription = this.authService.authState$.subscribe((isLoggedIn: boolean) => {
+      this.isLoggedIn = isLoggedIn;
+
+      if (isLoggedIn) {
+        this.loadCategoriesAndBrands();
+      }
+
+      this.cdr.detectChanges();
     });
 
-    this.customerService.getBrands().subscribe((result) => {
-      this.brandList = result;
-    });
-
-    // Setup search with debounce
     this.searchSubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe((searchTerm) => {
       if (searchTerm && searchTerm.trim()) {
         this.performSearch(searchTerm.trim());
@@ -45,12 +50,34 @@ export class Header implements OnInit {
     });
   }
 
+  private loadCategoriesAndBrands() {
+    forkJoin({
+      categories: this.customerService.getCategories(),
+      brands: this.customerService.getBrands()
+    }).subscribe({
+      next: (result) => {
+        this.categoryList = result.categories;
+        this.brandList = result.brands;
+        this.cdr.detectChanges();
+        console.log('Categories and brands loaded after login');
+      },
+      error: (error) => {
+        console.error('Error loading categories/brands:', error);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
   onSearchInput(searchTerm: string) {
     this.searchSubject.next(searchTerm);
   }
 
   onSearchClick(searchTerm: string) {
-    // For enter key, search immediately (clear debounce)
     if (searchTerm && searchTerm.trim()) {
       this.performSearch(searchTerm.trim());
     }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environment/environment';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { AuthResponse, RegisterData } from '../Models/auth';
 
 @Injectable({
@@ -15,9 +15,21 @@ export class AuthService {
   private loading = signal<boolean>(false);
   private error = signal<string | null>(null);
 
+  private authState = new BehaviorSubject<boolean>(false);
+  authState$ = this.authState.asObservable();
+
   // Expose signals as readonly
   readonly loading$ = this.loading.asReadonly();
   readonly error$ = this.error.asReadonly();
+
+  constructor() {
+    this.checkInitialAuth();
+  }
+
+  private checkInitialAuth() {
+    const token = localStorage.getItem('token');
+    this.authState.next(!!token);
+  }
 
   registerUser(userData: RegisterData): Observable<AuthResponse> {
     this.loading.set(true);
@@ -30,6 +42,10 @@ export class AuthService {
         // Store token if needed
         if (response.token) {
           localStorage.setItem('token', response.token);
+          if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+          }
+          this.authState.next(true);
         }
       }),
       catchError((error) => {
@@ -53,6 +69,7 @@ export class AuthService {
         if (response.token) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('user', JSON.stringify(response.user));
+          this.authState.next(true);
         }
       }),
       catchError((error) => {
@@ -99,6 +116,7 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this.authState.next(false);
   }
 
   // State management methods

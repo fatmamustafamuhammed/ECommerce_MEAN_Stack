@@ -100,7 +100,7 @@ $gray-border: #e9ecef;
   padding: 0;
   flex-wrap: wrap;
   color: white;
-
+ul{
   li {
     a {
       color: $white;
@@ -131,6 +131,7 @@ $gray-border: #e9ecef;
         transition: width 0.2s ease;
       }
     }
+  }
   }
 }
 

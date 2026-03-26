@@ -32,7 +32,7 @@
 
     @if(authService.isLoggedIn){
     <div class="category-bar">
-      <ul class="category-menu cursor-pointer">
+      <ul class="category-menu cursor-pointer">Categories :
         @for (category of categoryList; track category._id) {
         <li>
           <a (click)="searchCategory(category._id!)">{{ category.name }}</a>
@@ -46,7 +46,7 @@
 
     @if(authService.isLoggedIn){
     <div class="category-bar">
-      <ul class="category-menu cursor-pointer">
+      <ul class="category-menu cursor-pointer">Brands :
         @for (brand of brandList; track brand._id) {
         <li>
           <a (click)="searchbrand(brand._id!)">{{ brand.name }}</a>
