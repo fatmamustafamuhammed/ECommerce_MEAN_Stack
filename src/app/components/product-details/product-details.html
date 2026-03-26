@@ -22,11 +22,11 @@
           class="w-full h-96 object-cover transition-all duration-300">
       </div>
       <div class="flex gap-2">
-        @for (image of product.images; track image; let i = $index) {
-        <img title="img2" [src]="image" [alt]="product.name" (mouseenter)="changeImage(i)"
+        @for (image of product.images; track $index) {
+        <img title="img1" [src]="image" [alt]="product.name" (mouseenter)="changeImage($index)"
           class="w-20 h-20 object-cover rounded-lg border-2 transition-all duration-200 cursor-pointer"
-          [class.border-blue-500]="selectedImage === i" [class.border-gray-200]="selectedImage !== i"
-          [class.opacity-70]="selectedImage !== i" [class.scale-105]="selectedImage === i">
+          [class.border-blue-500]="selectedImage === $index" [class.border-gray-200]="selectedImage !== $index"
+          [class.opacity-70]="selectedImage !== $index" [class.scale-105]="selectedImage === $index">
         }
       </div>
     </div>
@@ -139,3 +139,20 @@
   </div>
 </div>
 }
+
+<!-- New Products Section -->
+<div class="p-5 mt-6 m-2 border border-black">
+  <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">Similar Products
+  </h4>
+
+  @if (similarProducts && similarProducts.length > 0) {
+  <div class="flex flex-wrap gap-4">
+    @for (product of similarProducts; track product._id) {
+    <app-product-card [product]="product" (addToCart)="handleAddToCart($event)">
+    </app-product-card>
+    }
+  </div>
+  } @else {
+  <p class="text-gray-500">No similar products available.</p>
+  }
+</div>
