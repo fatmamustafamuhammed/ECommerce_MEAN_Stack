@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -11,21 +11,31 @@ import { AuthService } from '../../services/auth';
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
-export class Login {
+export class Login implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loginForm: FormGroup;
   showPassword = false;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  sessionExpiredMessage = '';
 
   constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['sessionExpired'] === 'true') {
+        this.sessionExpiredMessage = 'Your session has expired. Please login again.';
+      }
     });
   }
 
@@ -50,6 +60,7 @@ export class Login {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.sessionExpiredMessage = '';
 
     const credentials = {
       email: this.loginForm.value.email,
@@ -62,7 +73,6 @@ export class Login {
         this.successMessage = response.message || 'Login successful! Redirecting...';
         this.loginForm.reset();
 
-        // Redirect after 3 seconds
         setTimeout(() => {
           this.router.navigate(['/']);
         }, 2000);

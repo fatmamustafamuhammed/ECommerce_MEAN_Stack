@@ -1,24 +1,25 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environment/environment';
-import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError, timer, interval, Subscription } from 'rxjs';
 import { AuthResponse, RegisterData } from '../Models/auth';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   private baseUrl = environment.apiUrl;
+  private tokenExpirationTimer: Subscription | null = null;
 
-  // State management
   private loading = signal<boolean>(false);
   private error = signal<string | null>(null);
 
   private authState = new BehaviorSubject<boolean>(false);
   authState$ = this.authState.asObservable();
 
-  // Expose signals as readonly
   readonly loading$ = this.loading.asReadonly();
   readonly error$ = this.error.asReadonly();
 
@@ -28,7 +29,58 @@ export class AuthService {
 
   private checkInitialAuth() {
     const token = localStorage.getItem('token');
-    this.authState.next(!!token);
+    if (token) {
+      if (this.isTokenValid(token)) {
+        this.authState.next(true);
+        this.startExpirationTimer(token);
+      } else {
+        this.logout();
+      }
+    } else {
+      this.authState.next(false);
+    }
+  }
+
+  private isTokenValid(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000; 
+      const currentTime = Date.now();
+
+      if (currentTime >= expirationTime) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  private getTokenExpirationTime(token: string): number {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000;
+      const currentTime = Date.now();
+      return expirationTime - currentTime;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  private startExpirationTimer(token: string): void {
+    if (this.tokenExpirationTimer) {
+      this.tokenExpirationTimer.unsubscribe();
+    }
+
+    const expirationDelay = this.getTokenExpirationTime(token);
+
+    if (expirationDelay > 0) {
+      this.tokenExpirationTimer = timer(expirationDelay).subscribe(() => {
+        this.logout('Session expired. Please login again.');
+      });
+    } else {
+      this.logout('Session expired. Please login again.');
+    }
   }
 
   registerUser(userData: RegisterData): Observable<AuthResponse> {
@@ -37,15 +89,9 @@ export class AuthService {
 
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, userData).pipe(
       tap((response) => {
-        console.log('Registration successful:', response);
         this.loading.set(false);
-        // Store token if needed
         if (response.token) {
-          localStorage.setItem('token', response.token);
-          if (response.user) {
-            localStorage.setItem('user', JSON.stringify(response.user));
-          }
-          this.authState.next(true);
+          this.setSession(response.token, response.user);
         }
       }),
       catchError((error) => {
@@ -63,13 +109,9 @@ export class AuthService {
 
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, credentials).pipe(
       tap((response) => {
-        console.log('Login successful:', response);
         this.loading.set(false);
-        // Store token if needed
         if (response.token) {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('user', JSON.stringify(response.user));
-          this.authState.next(true);
+          this.setSession(response.token, response.user);
         }
       }),
       catchError((error) => {
@@ -81,9 +123,16 @@ export class AuthService {
     );
   }
 
-  get isLoggedIn() {
-    let token = localStorage.getItem('token');
-    if (token) {
+  private setSession(token: string, user: any): void {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    this.authState.next(true);
+    this.startExpirationTimer(token);
+  }
+
+  get isLoggedIn(): boolean {
+    const token = localStorage.getItem('token');
+    if (token && this.isTokenValid(token)) {
       return true;
     }
     return false;
@@ -91,7 +140,7 @@ export class AuthService {
 
   get isAdmin() {
     let userData = localStorage.getItem('user');
-    if (userData) {
+    if (userData && this.isLoggedIn) {
       return JSON.parse(userData).isAdmin;
     }
     return false;
@@ -99,7 +148,7 @@ export class AuthService {
 
   get userName() {
     let userData = localStorage.getItem('user');
-    if (userData) {
+    if (userData && this.isLoggedIn) {
       return JSON.parse(userData).name;
     }
     return null;
@@ -107,19 +156,33 @@ export class AuthService {
 
   get userEmail() {
     let userData = localStorage.getItem('user');
-    if (userData) {
+    if (userData && this.isLoggedIn) {
       return JSON.parse(userData).email;
     }
     return null;
   }
 
-  logout() {
+  logout(message?: string): void {
+    if (this.tokenExpirationTimer) {
+      this.tokenExpirationTimer.unsubscribe();
+      this.tokenExpirationTimer = null;
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.authState.next(false);
+
+    if (message) {
+      console.log(message);
+    }
+
+    if (this.router.url !== '/login') {
+      this.router.navigate(['/login'], {
+        queryParams: { sessionExpired: true }
+      });
+    }
   }
 
-  // State management methods
   clearError(): void {
     this.error.set(null);
   }
