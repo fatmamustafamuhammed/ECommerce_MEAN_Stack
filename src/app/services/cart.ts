@@ -3,11 +3,7 @@ import { ProductModel } from '../Models/product';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment/environment';
-
-export interface CartItem {
-  quantity: number;
-  product: ProductModel;
-}
+import { CartItem } from '../Models/cart';
 
 @Injectable({
   providedIn: 'root',

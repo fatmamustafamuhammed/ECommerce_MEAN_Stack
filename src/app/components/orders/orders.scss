@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+button, a {
+  transition: all 0.2s ease;
+}
+
+.fixed {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

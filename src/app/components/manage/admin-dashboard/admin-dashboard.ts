@@ -25,4 +25,8 @@ export class AdminDashboard {
   goToProducts() {
     this.router.navigate(['/admin/products']);
   }
+
+  goToOrders() {
+    this.router.navigate(['/admin/orders']);
+  }
 }
