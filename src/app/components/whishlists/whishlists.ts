@@ -2,11 +2,12 @@ import { ProductCard } from '../product-card/product-card';
 import { wishListService } from './../../services/wishList';
 import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-whishlists',
   standalone: true,
-  imports: [ProductCard, CommonModule],
+  imports: [ProductCard, CommonModule,RouterLink],
   templateUrl: './whishlists.html',
   styleUrl: './whishlists.scss',
 })

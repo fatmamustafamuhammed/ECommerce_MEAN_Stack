@@ -39,8 +39,12 @@
             }
           </button>
 
-          <button type="button" matFab style="width: 56px; height: 56px;">
+          <button type="button" matFab style="width: 56px; height: 56px;" (click)="toggleCart()">
+            @if(isInCart()){
+            <mat-icon style="font-size: 28px; width: 28px; height: 28px;">remove_shopping_cart</mat-icon>
+            } @else {
             <mat-icon style="font-size: 28px; width: 28px; height: 28px;">add_shopping_cart</mat-icon>
+            }
           </button>
         </div>
       </div>

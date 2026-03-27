@@ -3,6 +3,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { ProductModel } from '../../Models/product';
 import { wishListService } from '../../services/wishList';
+import { cartService } from '../../services/cart';
 
 @Component({
   selector: 'app-product-card',
@@ -14,12 +15,18 @@ export class ProductCard {
   @Input() product: any;
   @Output() addToCart = new EventEmitter<any>();
   wishListService = inject(wishListService);
+  cartService = inject(cartService);
 
   private readonly DEFAULT_IMAGE = 'assets/images/default-product.png';
 
   isInWishList = computed(() => {
     if (!this.product?._id) return false;
     return this.wishListService.wishLists$().some((x) => x._id === this.product._id);
+  });
+
+  isInCart = computed(() => {
+    if (!this.product?._id) return false;
+    return this.cartService.carts$().some((x) => x._id === this.product._id);
   });
 
   getProductImage(): string {
@@ -34,15 +41,33 @@ export class ProductCard {
     return this.DEFAULT_IMAGE;
   }
 
-  onAddToCart(): void {
-    this.addToCart.emit(this.product);
+  toggleCart(): void {
+    if (this.isInCart()) {
+      this.cartService.deleteCart(this.product._id!).subscribe({
+        error: (error) => {
+          console.error('Remove from cart error:', error);
+        },
+        next: (response) => {
+          console.log('Product removed from cart:', response);
+        },
+      });
+    } else {
+      this.cartService.addToCart(this.product, 1).subscribe({
+        error: (error) => {
+          console.error('Add to cart error:', error);
+        },
+        next: (response) => {
+          console.log('Product added to cart:', response);
+        },
+      });
+    }
   }
 
   onImageError(event: any): void {
     event.target.src = this.DEFAULT_IMAGE;
   }
 
-  addToWishList(product: ProductModel) {
+  addToWishList(product: ProductModel): void {
     if (!product._id) return;
     this.wishListService.toggleWishList(product).subscribe({
       error: (error) => console.error('Wishlist toggle error:', error),

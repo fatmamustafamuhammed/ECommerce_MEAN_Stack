@@ -64,6 +64,7 @@
       </div>
 
       <div style="display: flex; gap: 20px;">
+        <!-- Wishlist Button -->
         <button type="button" matFab style="width: 56px; height: 56px;" (click)="addToWishList(product()!)">
           @if(isInWishList()){
           <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite</mat-icon>
@@ -71,18 +72,30 @@
           <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite_border</mat-icon>
           }
         </button>
-        <button type="button" matFab style="width: 56px; height: 56px;">
+
+        <!-- Cart Button - Toggle -->
+        <button type="button" matFab style="width: 56px; height: 56px;" (click)="toggleCart()">
+          @if(isInCart()){
+          <mat-icon style="font-size: 28px; width: 28px; height: 28px;">remove_shopping_cart</mat-icon>
+          } @else {
           <mat-icon style="font-size: 28px; width: 28px; height: 28px;">add_shopping_cart</mat-icon>
+          }
         </button>
       </div>
 
       <div class="flex gap-4 pt-4">
+        <button (click)="toggleCart()"
+          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+          @if(isInCart()){
+          Remove from Cart
+          } @else {
+          Add to Cart
+          }
+        </button>
         <button
-          class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">Add to
-          Cart</button>
-        <button
-          class="flex-1 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition font-semibold">Buy
-          Now</button>
+          class="flex-1 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition font-semibold">
+          Buy Now
+        </button>
       </div>
     </div>
   </div>

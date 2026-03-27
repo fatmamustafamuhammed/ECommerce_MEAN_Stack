@@ -28,6 +28,13 @@
           </mat-icon>
           <span>WishList</span>
         </a>
+        <a routerLink="/shopping-cart"
+          style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: whitesmoke;">
+          <mat-icon style="font-size: 28px; width: 28px; height: 28px; color: rgb(207, 11, 11);">
+            shoppping_cart
+          </mat-icon>
+          <span>ShoppingCart</span>
+        </a>
         <a (click)="onLogout()" class="logout-link">Logout</a>
         }
         @else{

@@ -5,6 +5,7 @@ import { ProductModel } from '../../Models/product';
 import { ProductCard } from '../product-card/product-card';
 import { Subscription } from 'rxjs';
 import { wishListService } from '../../services/wishList';
+import { cartService } from '../../services/cart';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -19,6 +20,7 @@ export class ProductDetails implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   wishListService = inject(wishListService);
+  cartService = inject(cartService);
 
   product = signal<ProductModel | null>(null);
   selectedImage = 0;
@@ -30,6 +32,12 @@ export class ProductDetails implements OnInit, OnDestroy {
     const p = this.product();
     if (!p?._id) return false;
     return this.wishListService.wishLists$().some((x) => x._id === p._id);
+  });
+
+  isInCart = computed(() => {
+    const p = this.product();
+    if (!p?._id) return false;
+    return this.cartService.carts$().some((x) => x._id === p._id);
   });
 
   private subscription = new Subscription();
@@ -82,6 +90,31 @@ export class ProductDetails implements OnInit, OnDestroy {
 
   changeImage(index: number) {
     this.selectedImage = index;
+  }
+
+  toggleCart(): void {
+    const currentProduct = this.product();
+    if (!currentProduct?._id) return;
+
+    if (this.isInCart()) {
+      this.cartService.deleteCart(currentProduct._id).subscribe({
+        error: (error) => {
+          console.error('Remove from cart error:', error);
+        },
+        next: (response) => {
+          console.log('Product removed from cart:', response);
+        },
+      });
+    } else {
+      this.cartService.addToCart(currentProduct, 1).subscribe({
+        error: (error) => {
+          console.error('Add to cart error:', error);
+        },
+        next: (response) => {
+          console.log('Product added to cart:', response);
+        },
+      });
+    }
   }
 
   handleAddToCart(product: any): void {
