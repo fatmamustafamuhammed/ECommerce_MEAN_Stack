@@ -7,11 +7,12 @@ import { Subscription } from 'rxjs';
 import { wishListService } from '../../services/wishList';
 import { cartService } from '../../services/cart';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [ProductCard, MatIconModule],
+  imports: [ProductCard, MatIconModule, MatProgressSpinner],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
 })

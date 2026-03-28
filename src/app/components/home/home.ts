@@ -4,10 +4,11 @@ import { CustomerService } from '../../services/customer';
 import { ProductCard } from '../product-card/product-card';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
 import { RouterLink } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-home',
-  imports: [ProductCard, CarouselModule, RouterLink],
+  imports: [ProductCard, CarouselModule, RouterLink, MatProgressSpinnerModule],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -54,6 +55,5 @@ export class Home implements OnInit {
 
   handleAddToCart(product: any): void {
     console.log('Adding to cart:', product);
-    //  this.cartService.addToCart(product);
   }
 }

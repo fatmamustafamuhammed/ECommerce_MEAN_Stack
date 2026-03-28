@@ -1,3 +1,4 @@
+<!-- Carousel Section -->
 <div class="carousel-container p-5 m-2 mt-2 border border-black">
   <owl-carousel-o [options]="customOptions" class="custom-carousel">
     @for (item of bannerImages; track $index) {
@@ -25,15 +26,21 @@
   <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">Featured Products
   </h4>
 
-  @if (featuredProducts && featuredProducts.length > 0) {
-  <div class="flex flex-wrap gap-4">
-    @for (product of featuredProducts; track product._id) {
-    <app-product-card [product]="product" (addToCart)="handleAddToCart($event)">
-    </app-product-card>
-    }
-  </div>
+  @if (customerService.loading$()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
   } @else {
-  <p class="text-gray-500">No featured products available.</p>
+    @if (featuredProducts && featuredProducts.length > 0) {
+    <div class="flex flex-wrap gap-4">
+      @for (product of featuredProducts; track product._id) {
+      <app-product-card [product]="product" (addToCart)="handleAddToCart($event)">
+      </app-product-card>
+      }
+    </div>
+    } @else {
+    <p class="text-gray-500">No featured products available.</p>
+    }
   }
 </div>
 
@@ -41,14 +48,20 @@
 <div class="p-5 mt-6 m-2 border border-black">
   <h4 class="text-3xl font-bold p-2 text-blue-800 bg-sky-500/40 text-center mb-2 border border-black">New Products</h4>
 
-  @if (newProducts && newProducts.length > 0) {
-  <div class="flex flex-wrap gap-4">
-    @for (product of newProducts; track product._id) {
-    <app-product-card [product]="product" (addToCart)="handleAddToCart($event)">
-    </app-product-card>
-    }
-  </div>
+  @if (customerService.loading$()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
   } @else {
-  <p class="text-gray-500">No new products available.</p>
+    @if (newProducts && newProducts.length > 0) {
+    <div class="flex flex-wrap gap-4">
+      @for (product of newProducts; track product._id) {
+      <app-product-card [product]="product" (addToCart)="handleAddToCart($event)">
+      </app-product-card>
+      }
+    </div>
+    } @else {
+    <p class="text-gray-500">No new products available.</p>
+    }
   }
 </div>

@@ -24,24 +24,59 @@ export class wishListService {
     this.getWishLists().subscribe();
   }
 
-  getWishLists(): Observable<ProductModel[]> {
-    this.loading.set(true);
-    this.error.set(null);
+getWishLists(): Observable<ProductModel[]> {
+  this.loading.set(true);
+  this.error.set(null);
 
-    return this.http.get<ProductModel[]>(`${this.baseUrl}/customer/whishLists`).pipe(
-      tap((wishLists) => {
-        const uniqueWishlists = this.removeDuplicates(wishLists);
-        this.wishLists.set(uniqueWishlists);
-        this.loading.set(false);
-      }),
-      catchError((error) => {
-        console.error('Error loading wishlists:', error);
-        this.error.set('Failed to load WishLists');
-        this.loading.set(false);
-        return throwError(() => error);
-      }),
-    );
-  }
+  return this.http.get<any[]>(`${this.baseUrl}/customer/whishLists`).pipe(
+    tap((response) => {
+      console.log('Wishlist response:', response);
+
+      let products: ProductModel[] = [];
+
+      if (Array.isArray(response)) {
+        if (response.length > 0 && response[0].product) {
+          products = response.map(item => item.product);
+        } else {
+          products = response;
+        }
+      }
+
+      const uniqueWishlists = this.removeDuplicates(products);
+      this.wishLists.set(uniqueWishlists);
+      this.loading.set(false);
+    }),
+    catchError((error) => {
+      console.error('Error loading wishlists:', error);
+      this.error.set('Failed to load WishLists');
+      this.loading.set(false);
+      return throwError(() => error);
+    }),
+  );
+}
+
+deleteWishList(productId: string): Observable<any> {
+  this.loading.set(true);
+  this.error.set(null);
+
+  console.log('Deleting wishlist item with productId:', productId);
+
+  return this.http.delete<any>(`${this.baseUrl}/customer/whishLists/${productId}`).pipe(
+    tap((response) => {
+      console.log('Delete response:', response);
+      this.wishLists.update((current) =>
+        current.filter((product) => product._id !== productId)
+      );
+      this.loading.set(false);
+    }),
+    catchError((error) => {
+      console.error('Error deleting from wishlist:', error);
+      this.error.set('Failed to delete from WishList');
+      this.loading.set(false);
+      return throwError(() => error);
+    }),
+  );
+}
 
   addToWishList(product: ProductModel): Observable<any> {
     this.loading.set(true);
@@ -66,24 +101,6 @@ export class wishListService {
       }),
       catchError((error) => {
         this.error.set('Failed to add to WishList');
-        this.loading.set(false);
-        return throwError(() => error);
-      }),
-    );
-  }
-
-  deleteWishList(id: string): Observable<void> {
-    this.loading.set(true);
-    this.error.set(null);
-
-    return this.http.delete<void>(`${this.baseUrl}/customer/whishLists/${id}`).pipe(
-      tap(() => {
-        this.wishLists.update((current) => current.filter((product) => product._id !== id));
-        this.loading.set(false);
-      }),
-      catchError((error) => {
-        console.error('Error deleting from wishlist:', error);
-        this.error.set('Failed to delete from WishList');
         this.loading.set(false);
         return throwError(() => error);
       }),

@@ -39,6 +39,12 @@
         </mat-select>
       </mat-form-field>
     </div>
+
+    @if (customerService.loading$()) {
+    <div class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+    } @else {
     <div class="flex flex-wrap gap-2">
       @for (product of products; track $index) {
       <app-product-card [product]="product"></app-product-card>
@@ -55,5 +61,6 @@
         Next
       </button>
     </div>
+    }
   </div>
 </div>

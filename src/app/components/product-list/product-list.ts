@@ -10,10 +10,11 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { FilterStateService } from '../../Shared/Services/Filter-State-service';
 import { Subscription } from 'rxjs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-product-list',
-  imports: [ProductCard, MatSelectModule, FormsModule, MatButtonModule],
+  imports: [ProductCard, MatSelectModule, FormsModule, MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })
@@ -123,6 +124,7 @@ export class ProductList implements OnInit {
         this.getProducts();
       });
   }
+  
   getProducts() {
     console.log('Calling getProducts with:', {
       searchTerm: this.searchTerm,
@@ -136,32 +138,30 @@ export class ProductList implements OnInit {
 
     this.isNext = true;
 
-    setTimeout(() => {
-      this.customerService
-        .getProducts(
-          this.searchTerm,
-          this.categoryId,
-          this.sortBy,
-          this.sortOrder,
-          this.brandId,
-          this.page,
-          this.pageSize,
-        )
-        .subscribe({
-          next: (result) => {
-            console.log('Products received:', result);
-            this.products = result;
+    this.customerService
+      .getProducts(
+        this.searchTerm,
+        this.categoryId,
+        this.sortBy,
+        this.sortOrder,
+        this.brandId,
+        this.page,
+        this.pageSize,
+      )
+      .subscribe({
+        next: (result) => {
+          console.log('Products received:', result);
+          this.products = result;
 
-            this.isNext = result.length === this.pageSize;
+          this.isNext = result.length === this.pageSize;
 
-            console.log('Is next page available:', this.isNext);
-          },
-          error: (error) => {
-            console.error('Error loading products:', error);
-            this.isNext = false;
-          },
-        });
-    }, 2000);
+          console.log('Is next page available:', this.isNext);
+        },
+        error: (error) => {
+          console.error('Error loading products:', error);
+          this.isNext = false;
+        },
+      });
   }
 
   orderChange(event: any) {
@@ -171,6 +171,7 @@ export class ProductList implements OnInit {
     this.page = 1;
     this.getProducts();
   }
+  
   pageChange(page: number) {
     this.page = page;
     this.getProducts();
