@@ -3,11 +3,12 @@ import { wishListService } from './../../services/wishList';
 import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-whishlists',
   standalone: true,
-  imports: [ProductCard, CommonModule,RouterLink],
+  imports: [ProductCard, CommonModule,RouterLink, MatProgressSpinner],
   templateUrl: './whishlists.html',
   styleUrl: './whishlists.scss',
 })

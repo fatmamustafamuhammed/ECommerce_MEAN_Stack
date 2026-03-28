@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { RegisterData } from '../../Models/auth';
 import { AuthService } from '../../services/auth';
 import { Router, RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatIconModule],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
 })

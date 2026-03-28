@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { OrderService } from '../../services/order';
 import { Order } from '../../Models/order';
 import { RouterLink } from '@angular/router';
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatProgressSpinner],
   templateUrl: './orders.html',
   styleUrl: './orders.scss',
 })
@@ -52,7 +53,7 @@ export class Orders implements OnInit {
     this.selectedOrder.set(null);
   }
   
-  // FIXED: Add proper type checking
+  // Add proper type checking
   getStatusColor(status: string | undefined): string {
     if (!status) return 'bg-gray-100 text-gray-800';
     
@@ -72,7 +73,7 @@ export class Orders implements OnInit {
     }
   }
   
-  // FIXED: Add proper type checking
+  // Add proper type checking
   getStatusText(status: string | undefined): string {
     if (!status) return 'Unknown';
     
@@ -103,7 +104,7 @@ export class Orders implements OnInit {
     });
   }
   
-  // FIXED: Safe access for order ID
+  // Safe access for order ID
   getOrderId(order: Order): string {
     return order._id || 'N/A';
   }

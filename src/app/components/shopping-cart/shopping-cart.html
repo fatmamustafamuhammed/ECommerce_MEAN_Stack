@@ -16,11 +16,8 @@
 
   <!-- Loading State -->
   @if (cartService.loading$()) {
-  <div class="flex justify-center items-center h-64">
-    <div class="text-center">
-      <div class="text-4xl mb-4">🔄</div>
-      <div class="text-gray-500">Loading your cart...</div>
-    </div>
+  <div class="loading-state">
+    <mat-spinner diameter="50"></mat-spinner>
   </div>
   }
 

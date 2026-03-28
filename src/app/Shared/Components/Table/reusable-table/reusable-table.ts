@@ -205,7 +205,7 @@ getCellValue(element: any, column: TableColumnConfig): any {
     case 'currency':
       return value ? `$${Number(value).toFixed(2)}` : '';
     case 'boolean':
-      // Fix: Return 'true' or 'false' for boolean values
+      // Return 'true' or 'false' for boolean values
       if (typeof value === 'boolean') {
         return value ? 'true' : 'false';
       }

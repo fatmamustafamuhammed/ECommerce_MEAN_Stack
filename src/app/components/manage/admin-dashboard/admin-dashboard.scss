@@ -1,11 +1,11 @@
 .admin-dashboard {
   min-height: 100vh;
   padding: 2rem;
-  
+
   .container {
     max-width: 1200px;
     margin: 0 auto;
-    
+
     .dashboard-title {
       text-align: center;
       color: rgb(54, 50, 50);
@@ -13,29 +13,29 @@
       font-weight: 600;
       margin-bottom: 3rem;
     }
-    
+
     .buttons-container {
       display: flex;
       justify-content: center;
       gap: 2rem;
       flex-wrap: wrap;
-      
+
       button {
         min-width: 200px;
         padding: 1rem 2rem;
         font-size: 1.1rem;
         font-weight: 500;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        
+
         mat-icon {
           margin-right: 8px;
         }
-        
+
         &:hover {
           transform: translateY(-3px);
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        
+
         &:active {
           transform: translateY(0);
         }
@@ -44,22 +44,21 @@
   }
 }
 
-// Responsive Design
 @media (max-width: 768px) {
   .admin-dashboard {
     padding: 1rem;
-    
+
     .container {
       .dashboard-title {
         font-size: 1.8rem;
         margin-bottom: 2rem;
       }
-      
+
       .buttons-container {
         gap: 1rem;
         flex-direction: column;
         align-items: center;
-        
+
         button {
           width: 100%;
           max-width: 300px;

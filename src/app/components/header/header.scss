@@ -135,7 +135,6 @@ ul{
   }
 }
 
-// Responsive Design
 @media (max-width: 768px) {
   .container {
     padding: 0.8rem 1.2rem;
@@ -201,12 +200,7 @@ ul{
     cursor: pointer;
     padding: 0.5rem 1rem;
     border-radius: 8px;
-    // background: rgba(255, 255, 255, 0.1);
     font-weight: 500;
-
-    // &:hover {
-      // background: rgba(255, 255, 255, 0.2);
-    // }
   }
 
   .logout-link {

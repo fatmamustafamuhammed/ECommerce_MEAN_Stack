@@ -2,11 +2,12 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../../services/order';
 import { Order } from '../../../Models/order';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatProgressSpinner],
   templateUrl: './admin-orders.html',
   styleUrl: './admin-orders.scss',
 })

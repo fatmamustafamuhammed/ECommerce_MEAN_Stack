@@ -12,19 +12,20 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink,MatIconModule],
+  imports: [RouterLink, MatIconModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
 export class Header implements OnInit, OnDestroy {
   customerService = inject(CustomerService);
   brandService = inject(BrandService);
-  categoryList: CategoryModel[] = [];
-  brandList: BrandModel[] = [];
   authService = inject(AuthService);
   router = inject(Router);
   filterStateService = inject(FilterStateService);
   private cdr = inject(ChangeDetectorRef);
+
+  categoryList: CategoryModel[] = [];
+  brandList: BrandModel[] = [];
 
   private searchSubject = new Subject<string>();
   private authSubscription = new Subscription();
@@ -54,7 +55,7 @@ export class Header implements OnInit, OnDestroy {
   private loadCategoriesAndBrands() {
     forkJoin({
       categories: this.customerService.getCategories(),
-      brands: this.customerService.getBrands()
+      brands: this.customerService.getBrands(),
     }).subscribe({
       next: (result) => {
         this.categoryList = result.categories;
@@ -64,7 +65,7 @@ export class Header implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading categories/brands:', error);
-      }
+      },
     });
   }
 

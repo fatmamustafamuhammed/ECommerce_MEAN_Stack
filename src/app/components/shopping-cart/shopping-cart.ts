@@ -6,11 +6,12 @@ import { FormsModule } from '@angular/forms';
 import { CartItem } from '../../Models/cart';
 import { OrderService } from '../../services/order';
 import { Order } from '../../Models/order';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-shopping-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatProgressSpinner],
   templateUrl: './shopping-cart.html',
   styleUrl: './shopping-cart.scss',
 })
