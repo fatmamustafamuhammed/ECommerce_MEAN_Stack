@@ -125,7 +125,8 @@ export const routes: Routes = [
     component: Login,
   },
   { 
-    path: '**', 
+    path: '**',
     redirectTo: '', 
   },
+  ////////////////////////////////
 ];
