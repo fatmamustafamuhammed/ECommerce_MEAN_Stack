@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/webapp/browser/**",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/angular"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/dist/webapp/browser/index.html"
+      "dest": "/"
     }
   ]
 }
