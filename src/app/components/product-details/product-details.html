@@ -63,6 +63,7 @@
         }
       </div>
 
+      @if(authService.isLoggedIn && !authService.isAdmin){
       <div style="display: flex; gap: 20px;">
         <!-- Wishlist Button -->
         <button type="button" matFab style="width: 56px; height: 56px;" (click)="addToWishList(product()!)">
@@ -82,7 +83,9 @@
           }
         </button>
       </div>
+      }
 
+      @if(authService.isLoggedIn && !authService.isAdmin){
       <div class="flex gap-4 pt-4">
         <button (click)="toggleCart()"
           class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
@@ -97,6 +100,7 @@
           Buy Now
         </button>
       </div>
+      }
     </div>
   </div>
 

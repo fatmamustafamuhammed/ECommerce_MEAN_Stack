@@ -31,6 +31,9 @@
       </div>
       <div style="display: flex; justify-content: flex-end; width: 100%; padding: 16px;">
         <div style="display: flex; gap: 20px;">
+
+          <!-- Only show for logged-in users who are NOT admin -->
+          @if(authService.isLoggedIn && !authService.isAdmin){
           <button type="button" matFab style="width: 56px; height: 56px;" (click)="addToWishList(product)">
             @if(isInWishList()){
             <mat-icon style="font-size: 28px; width: 28px; height: 28px;">favorite</mat-icon>
@@ -46,6 +49,8 @@
             <mat-icon style="font-size: 28px; width: 28px; height: 28px;">add_shopping_cart</mat-icon>
             }
           </button>
+          }
+
         </div>
       </div>
     </div>

@@ -1,18 +1,18 @@
 import { ProductCard } from '../product-card/product-card';
-import { wishListService } from './../../services/wishList';
+import { wishListService } from '../../services/wishList';
 import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
-  selector: 'app-whishlists',
+  selector: 'app-wishlists',
   standalone: true,
-  imports: [ProductCard, CommonModule,RouterLink, MatProgressSpinner],
-  templateUrl: './whishlists.html',
-  styleUrl: './whishlists.scss',
+  imports: [ProductCard, CommonModule, RouterLink, MatProgressSpinner],
+  templateUrl: './wishlists.html',
+  styleUrl: './wishlists.scss',
 })
-export class Whishlists implements OnInit {
+export class Wishlists implements OnInit {
   wishListService = inject(wishListService);
 
   // Create a computed signal to get wishlist items

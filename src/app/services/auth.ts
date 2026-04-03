@@ -1,7 +1,16 @@
 import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environment/environment';
-import { BehaviorSubject, catchError, Observable, tap, throwError, timer, interval, Subscription } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  Observable,
+  tap,
+  throwError,
+  timer,
+  interval,
+  Subscription,
+} from 'rxjs';
 import { AuthResponse, RegisterData } from '../Models/auth';
 import { Router } from '@angular/router';
 
@@ -44,7 +53,7 @@ export class AuthService {
   private isTokenValid(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      const expirationTime = payload.exp * 1000; 
+      const expirationTime = payload.exp * 1000;
       const currentTime = Date.now();
 
       if (currentTime >= expirationTime) {
@@ -130,6 +139,7 @@ export class AuthService {
     this.startExpirationTimer(token);
   }
 
+  // Getter (Property)
   get isLoggedIn(): boolean {
     const token = localStorage.getItem('token');
     if (token && this.isTokenValid(token)) {
@@ -178,7 +188,7 @@ export class AuthService {
 
     if (this.router.url !== '/login') {
       this.router.navigate(['/login'], {
-        queryParams: { sessionExpired: true }
+        queryParams: { sessionExpired: true },
       });
     }
   }

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { ProductModel } from '../../Models/product';
 import { wishListService } from '../../services/wishList';
 import { cartService } from '../../services/cart';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-product-card',
@@ -16,6 +17,7 @@ export class ProductCard {
   @Output() addToCart = new EventEmitter<any>();
   wishListService = inject(wishListService);
   cartService = inject(cartService);
+  authService = inject(AuthService);
 
   private readonly DEFAULT_IMAGE = 'assets/images/default-product.png';
 

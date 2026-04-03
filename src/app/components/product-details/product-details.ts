@@ -1,3 +1,4 @@
+import { AuthService } from './../../services/auth';
 import { Component, inject, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService } from '../../services/customer';
@@ -22,6 +23,7 @@ export class ProductDetails implements OnInit, OnDestroy {
   router = inject(Router);
   wishListService = inject(wishListService);
   cartService = inject(cartService);
+  authService = inject(AuthService);
 
   product = signal<ProductModel | null>(null);
   selectedImage = 0;

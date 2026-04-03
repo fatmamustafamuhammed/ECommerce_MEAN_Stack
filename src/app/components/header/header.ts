@@ -43,7 +43,7 @@ export class Header implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    this.searchSubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe((searchTerm) => {
+    this.searchSubject.pipe(debounceTime(2000), distinctUntilChanged()).subscribe((searchTerm) => {
       if (searchTerm && searchTerm.trim()) {
         this.performSearch(searchTerm.trim());
       } else if (searchTerm === '') {

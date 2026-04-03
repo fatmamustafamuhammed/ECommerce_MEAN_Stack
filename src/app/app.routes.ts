@@ -14,10 +14,10 @@ import { authGuard } from './core/auth-guard';
 import { AdminDashboard } from './components/manage/admin-dashboard/admin-dashboard';
 import { adminGuard } from './core/admin-guard';
 import { CustomerProfile } from './components/customer-profile/customer-profile';
-import { Whishlists } from './components/whishlists/whishlists';
 import { ShoppingCart } from './components/shopping-cart/shopping-cart';
 import { Orders } from './components/orders/orders';
 import { AdminOrders } from './components/manage/admin-orders/admin-orders';
+import { Wishlists } from './components/wishlists/wishlists';
 
 export const routes: Routes = [
   // Auth Guard
@@ -42,8 +42,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'whishlists',
-    component: Whishlists,
+    path: 'wishlists',
+    component: Wishlists,
     canActivate: [authGuard],
   },
   {

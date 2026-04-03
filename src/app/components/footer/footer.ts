@@ -10,9 +10,12 @@ import { Component, inject, OnInit } from '@angular/core';
 })
 export class Footer implements OnInit {
   currentYear: number = new Date().getFullYear();
+
   customerService = inject(CustomerService);
   authService = inject(AuthService);
+
   categoryList: CategoryModel[] = [];
+
   ngOnInit() {
     this.customerService.getCategories().subscribe((result) => {
       this.categoryList = result;
