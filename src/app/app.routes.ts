@@ -18,6 +18,7 @@ import { ShoppingCart } from './components/shopping-cart/shopping-cart';
 import { Orders } from './components/orders/orders';
 import { AdminOrders } from './components/manage/admin-orders/admin-orders';
 import { Wishlists } from './components/wishlists/wishlists';
+import { NotFound } from './components/not-found/not-found';
 
 export const routes: Routes = [
   // Auth Guard
@@ -124,9 +125,9 @@ export const routes: Routes = [
     path: 'login',
     component: Login,
   },
-  { 
+  {
     path: '**',
-    redirectTo: '', 
+    component: NotFound,
   },
   ////////////////////////////////
 ];
